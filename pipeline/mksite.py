@@ -112,7 +112,8 @@ def index(issues):
   <h1>पालकनीती</h1>
   <p class="tag">मासिक अंक</p>
   {body}
-  <footer><p>सर्व लेख <a href="https://palakneeti.in">palakneeti.in</a> वर प्रसिद्ध झाले आहेत.</p></footer>
+  <footer><p>सर्व लेख <a href="https://palakneeti.in">palakneeti.in</a> वर प्रसिद्ध झाले आहेत.</p>
+  <p style="margin-top:.6rem"><a href="guide/">संपादकांसाठी : नवा अंक कसा तयार करायचा</a></p></footer>
 </main></body></html>
 '''
 

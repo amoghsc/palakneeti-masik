@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="mr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>अंक कसा तयार करायचा — पालकनीती</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Tiro+Devanagari+Marathi&display=swap">
+<style>
+:root{--paper:#F6F8F4;--surface:#EDF1EA;--ink:#16211D;--soft:#56685F;
+ --faint:#7C8C84;--moss:#1F5A4C;--clay:#BC5D2C;--rule:#DBE3DA;--warn:#FDF0E4;
+ --serif:'Tiro Devanagari Marathi','Noto Serif Devanagari',Georgia,serif;
+ --sans:'Mukta','Noto Sans Devanagari',system-ui,sans-serif;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --paper:#101613;--surface:#18211D;--ink:#E6EBE4;--soft:#9DACA3;
+ --faint:#7E8D85;--moss:#7CC4AB;--clay:#E4885C;--rule:#25322C;--warn:#2A211A;}}
+:root[data-theme="dark"]{--paper:#101613;--surface:#18211D;--ink:#E6EBE4;
+ --soft:#9DACA3;--faint:#7E8D85;--moss:#7CC4AB;--clay:#E4885C;--rule:#25322C;--warn:#2A211A;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+ font-size:17px;line-height:1.75;-webkit-text-size-adjust:100%}
+main{max-width:36rem;margin:0 auto;padding:2.6rem 1.15rem 4rem}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(2rem,9vw,2.7rem);
+ margin:0 0 .3rem;color:var(--moss);line-height:1.15}
+.sub{color:var(--faint);margin:0 0 2.4rem;font-size:1rem}
+h2{font-family:var(--serif);font-weight:400;font-size:1.5rem;margin:2.8rem 0 .2rem;
+ color:var(--ink);line-height:1.3}
+h2 .en{font-family:var(--sans);font-size:.95rem;color:var(--faint);font-weight:400}
+p{margin:0 0 1rem}
+.when{background:var(--surface);border-radius:5px;padding:1.1rem 1.2rem;margin:0 0 2rem}
+.when p{margin:0}
+.when b{color:var(--moss)}
+ol.steps{list-style:none;counter-reset:s;margin:0;padding:0}
+ol.steps>li{counter-increment:s;position:relative;padding:0 0 1.6rem 3rem;
+ border-left:2px solid var(--rule);margin-left:1rem}
+ol.steps>li:last-child{border-left-color:transparent}
+ol.steps>li::before{content:counter(s);position:absolute;left:-1.05rem;top:-.15rem;
+ width:2.1rem;height:2.1rem;border-radius:50%;background:var(--moss);color:var(--paper);
+ display:grid;place-items:center;font-weight:700;font-size:.95rem;
+ font-variant-numeric:tabular-nums}
+.btn{display:inline-block;background:var(--moss);color:var(--paper);
+ text-decoration:none;font-weight:600;padding:.6rem 1.15rem;border-radius:999px;
+ margin:.3rem 0 .2rem}
+.look{background:var(--surface);border-left:3px solid var(--clay);border-radius:0 4px 4px 0;
+ padding:.75rem 1rem;margin:.7rem 0;font-size:.95rem;color:var(--soft)}
+.look b{color:var(--ink)}
+kbd{background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+ padding:.1rem .45rem;font-family:var(--sans);font-size:.92em;font-weight:600;
+ color:var(--ink);white-space:nowrap}
+.warn{background:var(--warn);border-radius:5px;padding:1rem 1.2rem;margin:1.2rem 0}
+.warn p:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:.5rem 0 1.2rem;font-size:.96rem}
+td{padding:.55rem .5rem;border-top:1px solid var(--rule);vertical-align:top}
+td:first-child{width:8.5rem;color:var(--faint)}
+.q{font-weight:600;color:var(--ink);margin:1.4rem 0 .2rem}
+footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--rule);
+ color:var(--faint);font-size:.9rem}
+a{color:var(--moss)}
+</style></head>
+<body><main>
+
+<h1>अंक कसा तयार करायचा</h1>
+<p class="sub">दर महिन्याला ३ पायऱ्या · साधारण ५ मिनिटं</p>
+
+<div class="when">
+  <p><b>कधी करायचं?</b> महिना संपल्यावर, पुढच्या महिन्याच्या पहिल्या
+  आठवड्यात — म्हणजे त्या महिन्याचे सगळे लेख ब्लॉगवर आल्यानंतर.</p>
+  <p style="margin-top:.6rem">उदाहरण : <b>ऑगस्टचा</b> अंक ७ सप्टेंबरनंतर तयार करायचा.
+  तेव्हा महिन्याचा क्रमांक <kbd>2026-08</kbd> असा लिहायचा.</p>
+</div>
+
+<h2>सुरुवातीला एकदाच <span class="en">— one-time</span></h2>
+<p>GitHub नावाच्या वेबसाईटवर स्वतःचं मोफत खातं उघडा
+(<a href="https://github.com/signup">github.com/signup</a>), आणि तुमचं
+<i>username</i> अमोघला कळवा. तो तुम्हाला परवानगी देईल. हे एकदाच करायचं आहे.</p>
+
+<h2>पायरी १ · काय प्रसिद्ध झालंय ते बघा <span class="en">— Preview</span></h2>
+<ol class="steps">
+  <li>
+    ही लिंक उघडा :
+    <a class="btn" href="https://github.com/amoghsc/palakneeti-masik/actions/workflows/preview-month.yml">Preview a month</a>
+  </li>
+  <li>
+    उजवीकडे, जुन्या नोंदींच्या यादीच्या <b>वर</b>, एक करडं बटण दिसेल —
+    <kbd>Run workflow ▾</kbd>. त्यावर क्लिक करा.
+  </li>
+  <li>
+    एक छोटी खिडकी उघडेल. त्यात एक रिकामा चौकोन असेल. त्यात महिना लिहा —
+    <kbd>2026-08</kbd>. वरचा <i>Branch: main</i> तसाच राहू द्या.
+  </li>
+  <li>
+    त्याच खिडकीतलं हिरवं <kbd>Run workflow</kbd> बटण दाबा.
+    <div class="look">खिडकी बंद होईल आणि <b>काहीच झालं नाही असं वाटेल</b>.
+    घाबरू नका — <b>पान refresh करा</b>. वर एक नवी ओळ दिसेल.</div>
+  </li>
+  <li>
+    ओळीपुढे पिवळं वर्तुळ फिरत असेल. साधारण <b>१५ सेकंदांत</b> ते हिरव्या
+    ✓ मध्ये बदलेल. मग <b>त्या ओळीवर क्लिक करा</b>.
+    <div class="look">त्या पानावरच त्या महिन्याच्या लेखांची यादी दिसेल —
+    नाव, तारीख आणि लिंक.</div>
+  </li>
+</ol>
+
+<div class="warn">
+  <p><b>यादी बघून ठरवा :</b> सगळे लेख आलेत का? पूर्ण अंकात साधारण ५ ते ७ लेख
+  असतात. जर फक्त २-३ दिसत असतील, तर अजून सगळे लेख ब्लॉगवर आलेले नाहीत —
+  थोडं थांबा, आणि नंतर पुन्हा पायरी १ करा.</p>
+</div>
+
+<h2>पायरी २ · अंक तयार करा <span class="en">— Build</span></h2>
+<ol class="steps">
+  <li>
+    ही लिंक उघडा :
+    <a class="btn" href="https://github.com/amoghsc/palakneeti-masik/actions/workflows/build-issue.yml">Build issue</a>
+  </li>
+  <li>
+    तसंच उजवीकडचं <kbd>Run workflow ▾</kbd> बटण दाबा. आता चार गोष्टी विचारल्या
+    जातील :
+    <table>
+      <tr><td>Month</td><td><kbd>2026-08</kbd> — महिना</td></tr>
+      <tr><td>Page layout</td><td><kbd>twocol</kbd> — दोन स्तंभ. हेच ठेवा.</td></tr>
+      <tr><td>Cover page</td><td><kbd>title</kbd> — मुखपृष्ठावर नाव आणि महिना</td></tr>
+      <tr><td>Publish…</td><td>बरोबरची खूण <b>तशीच राहू द्या</b></td></tr>
+    </table>
+  </li>
+  <li>
+    हिरवं <kbd>Run workflow</kbd> दाबा, आणि पान <b>refresh</b> करा.
+    <div class="look">यावेळी साधारण <b>१ मिनिट</b> लागेल. हिरवी ✓ येईपर्यंत थांबा.</div>
+  </li>
+</ol>
+
+<h2>पायरी ३ · लिंक आणि PDF घ्या</h2>
+<p>तयार झालेला अंक इथे दिसेल :</p>
+<p><a class="btn" href="https://amoghsc.github.io/palakneeti-masik/">पालकनीती मासिक — सगळे अंक</a></p>
+<p>त्या पानावर प्रत्येक महिन्यापुढे दोन बटणं आहेत :</p>
+<table>
+  <tr><td><b>वाचा</b></td><td>मोबाईलवर वाचण्याची लिंक — हीच WhatsApp वर पाठवायची</td></tr>
+  <tr><td><b>PDF</b></td><td>छापण्यासाठीची फाईल — हीसुद्धा पाठवता येईल</td></tr>
+</table>
+<div class="look">दोन्हींपैकी कशावरही उजवी-क्लिक करून <b>“Copy link”</b> घ्या,
+आणि तीच लिंक WhatsApp वर पाठवा.</div>
+
+<div class="warn">
+  <p>नवा अंक दिसायला <b>एखादं मिनिट जास्त</b> लागू शकतं. दिसला नाही तर
+  थोडं थांबून पान refresh करा.</p>
+</div>
+
+<h2>काही अडलं तर <span class="en">— if something looks wrong</span></h2>
+
+<p class="q">ओळीपुढे लाल ✗ आलं</p>
+<p>काहीतरी चुकलंय. काळजी करू नका, काहीही बिघडलेलं नाही. त्या ओळीवर क्लिक करा,
+आणि तो स्क्रीनशॉट अमोघला पाठवा.</p>
+
+<p class="q">“No category found for this month”</p>
+<p>त्या महिन्याचा एकही लेख अजून ब्लॉगवर आलेला नाही, किंवा महिन्याचा क्रमांक
+चुकला आहे. <kbd>2026-08</kbd> असा — आधी वर्ष, मग महिना — लिहिला आहे ना, ते बघा.</p>
+
+<p class="q">लेख कमी दिसतायत</p>
+<p>ब्लॉगवरचा तो लेख <i>त्या महिन्याच्या</i> category मध्ये टाकलेला आहे का ते
+बघा. खेळघरच्या आणि सूचनांच्या पोस्ट मुद्दामच वगळल्या जातात.</p>
+
+<p class="q">चुकून चुकीचा महिना दिला</p>
+<p>काहीच बिघडत नाही. बरोबर महिना देऊन पुन्हा पायरी २ करा.</p>
+
+<p class="q">दोघांनी एकाच वेळी केलं तर?</p>
+<p>चालतं. वेगवेगळे महिने एकाच वेळी तयार होऊ शकतात.</p>
+
+<footer>
+  <p>पालकनीती मासिक · हे पान अंक तयार करणाऱ्या संपादकांसाठी आहे.<br>
+  अडचण आल्यास अमोघला विचारा.</p>
+</footer>
+
+</main></body></html>
