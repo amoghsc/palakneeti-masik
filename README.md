@@ -128,13 +128,22 @@ Marathi** from Google Fonts for titles.
 
 ## A note on what has been tested
 
-The pipeline itself has been run end to end many times, and the exact sequence
-of commands in the workflow was rehearsed locally against a clean copy of this
-repository for three different months.
+Both workflows have been run for real on GitHub Actions and both pass:
 
-**The GitHub Actions workflows themselves have not yet run on GitHub** — that
-could not be tested without pushing the repo. Both files are valid YAML and the
-steps are the ones that were rehearsed, but expect to fix a small thing on the
-first run. The two most likely spots are the Chrome step (there is an install
-fallback if the runner image ever drops it) and the push in the publish step,
-which needs the write permission in setup step 2 above.
+- **Preview a month** — `2026-08`, 13s. Lists the articles with dates and links.
+- **Build issue** — `2026-08` (editorial/title) and `2026-07` (classic/blank),
+  about 45s each. PDF and Canva file uploaded as artifacts, mobile edition
+  published, site index updated. Three issues are live on the site.
+
+Three things had to be fixed to get there, all now in the code:
+
+1. **Chrome 151 on the runner ignores `--virtual-time-budget`**, so the old
+   `--dump-dom` approach read the page before Paged.js had finished. The build
+   now drives the browser with Playwright and waits for the page to say it is
+   done — which is both correct and about eight times faster.
+2. **The fetch step piped through `tee`**, so a failed fetch still reported
+   success and the build died three steps later with a confusing error. Fixed
+   with `pipefail`, plus browser-like request headers and an error message that
+   prints what the server actually returned.
+3. **GitHub Pages ran Jekyll over the site** and failed on it, so the published
+   pages silently lagged a deploy behind. `docs/.nojekyll` turns that off.
