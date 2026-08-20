@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Fetch one month's articles from palakneeti.in and turn them into the
    structured form the layout needs.   usage: fetchparse.py <issue-key>"""
-import json, os, re, sys, urllib.request, urllib.parse, urllib.error
+import json, os, re, sys, time, urllib.request, urllib.parse, urllib.error
 from bs4 import BeautifulSoup, NavigableString
 from issues import resolve, find_category
 
@@ -23,17 +23,37 @@ HEADERS = {
 }
 
 
-def fetch_json(url):
-    req = urllib.request.Request(url, headers=HEADERS)
-    try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            raw = r.read()
-            ctype = r.headers.get('Content-Type', '?')
-    except urllib.error.HTTPError as e:
-        body = e.read()[:400].decode('utf-8', 'replace')
-        raise SystemExit(f'!! {url}\n   HTTP {e.code} {e.reason}\n   {body}')
-    except urllib.error.URLError as e:
-        raise SystemExit(f'!! {url}\n   could not connect: {e.reason}')
+BLOCKED = (
+    'The site\'s bot protection (Imunify360) refused this request.\n'
+    '   It blocks datacenter IP addresses, which is what a GitHub runner uses.\n'
+    '   It is intermittent, so trying again in a few minutes often works.\n'
+    '   For a permanent fix, ask whoever hosts palakneeti.in to allow either\n'
+    '   the GitHub Actions IP ranges or this tool\'s User-Agent.')
+
+
+def fetch_json(url, attempts=4):
+    """Fetch JSON, retrying a bot-protection block rather than losing the run."""
+    last = ''
+    for n in range(1, attempts + 1):
+        req = urllib.request.Request(url, headers=HEADERS)
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                raw = r.read()
+                ctype = r.headers.get('Content-Type', '?')
+            break
+        except urllib.error.HTTPError as e:
+            body = e.read()[:400].decode('utf-8', 'replace')
+            last = f'HTTP {e.code} {e.reason}\n   {body}'
+            transient = e.code in (403, 429, 500, 502, 503, 504)
+        except urllib.error.URLError as e:
+            last, transient = f'could not connect: {e.reason}', True
+        if n == attempts or not transient:
+            hint = ('\n   ' + BLOCKED) if 'Imunify360' in last else ''
+            raise SystemExit(f'!! {url}\n   {last}{hint}')
+        wait = 5 * n * n                      # 5s, 20s, 45s
+        print(f'   blocked ({last.splitlines()[0]}) — retrying in {wait}s '
+              f'[{n}/{attempts - 1}]', flush=True)
+        time.sleep(wait)
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
