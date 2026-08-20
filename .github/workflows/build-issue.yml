@@ -27,7 +27,7 @@ on:
         type: boolean
 
 concurrency:
-  group: build-issue
+  group: build-issue-${{ inputs.month }}
   cancel-in-progress: false
 
 jobs:
@@ -116,10 +116,19 @@ jobs:
           git add docs
           if git diff --cached --quiet; then
             echo "Nothing changed on the site."
-          else
-            git commit -m "अंक ${{ inputs.month }} — mobile edition"
-            git push
+            exit 0
           fi
+          git commit -m "अंक ${{ inputs.month }} — mobile edition"
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "published on attempt $attempt"
+              exit 0
+            fi
+            echo "push rejected — another build published first; rebasing"
+            git pull --rebase origin main
+          done
+          echo "::error::could not publish the site after 5 attempts"
+          exit 1
 
       - name: Summary
         run: |
