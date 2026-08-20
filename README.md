@@ -8,6 +8,19 @@ Turns a month's articles from palakneeti.in into:
 
 Nobody needs to install anything. It runs on GitHub.
 
+## → The two buttons
+
+| | Link |
+|---|---|
+| **Check what's published** | https://github.com/amoghsc/palakneeti-masik/actions/workflows/preview-month.yml |
+| **Build the issue** | https://github.com/amoghsc/palakneeti-masik/actions/workflows/build-issue.yml |
+| **The published site** | https://amoghsc.github.io/palakneeti-masik/ |
+
+On either workflow page, the **`Run workflow ▾`** button sits on the right,
+just above the list of previous runs. Click it, fill the box, click the green
+**Run workflow**. Then refresh the page — the new run appears at the top, amber
+while it works, green when it is done. Click the run to see the result.
+
 ---
 
 ## Every month: how to make the new issue
