@@ -100,6 +100,9 @@ def index(issues):
   <ul class="titles">{titles}</ul>
 </section>''')
     body = '\n'.join(rows) or '<p class="empty">अजून एकही अंक तयार झालेला नाही.</p>'
+    if os.path.isdir(os.path.join(DOCS, 'authors')):
+        body += ('<p style="margin-top:2rem"><a class="read" style="display:inline-block"'
+                 ' href="authors/">लेखकांनुसार सगळे लेख →</a></p>')
     return f'''<!doctype html>
 <html lang="mr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">

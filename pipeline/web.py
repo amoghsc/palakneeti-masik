@@ -13,6 +13,28 @@ DATA = CFG.get('data', KEY)
 IMGDIR = os.path.join(B, 'images', DATA)
 
 esc = lambda t: html.escape(t, quote=False)
+
+# Built by authors.py. When present, bylines become links to the author's page.
+ROOT = os.path.abspath(sys.argv[2] if len(sys.argv) > 2 else os.path.join(BASE, '..'))
+try:
+    AUTHORS = json.load(open(os.path.join(ROOT, 'docs', 'authors', 'map.json')))
+except Exception:
+    AUTHORS = {}
+_akey = lambda n: re.sub(r'\s+', '', n or '').lower()
+AUTHOR_BY_KEY = {_akey(k): v for k, v in AUTHORS.items()}
+ROLE_SPLIT = re.compile(r'^(अनुवाद|शब्दांकन|छायाचित्र[े]?|संकलन)\s*[:：]\s*(.+)$')
+
+
+def author_html(name):
+    """Link a byline to its author page, keeping any 'अनुवाद :' prefix outside
+       the link so only the person's name is clickable."""
+    m = ROLE_SPLIT.match(name.strip())
+    prefix, person = (m.group(1) + ' : ', m.group(2)) if m else ('', name)
+    slug = AUTHOR_BY_KEY.get(_akey(person.strip(' .,')))
+    if not slug:
+        return esc(name)
+    return (f'{esc(prefix)}<a class="who-link" href="../authors/{slug}/">'
+            f'{esc(person)}</a>')
 DEV = '०१२३४५६७८९'
 dev = lambda n: ''.join(DEV[int(c)] for c in str(n))
 
@@ -110,7 +132,7 @@ def article_html(a, n, total):
         p.append(f'<p class="eyebrow">{esc(a["kicker"])}</p>')
     p.append(f'<h2>{esc(a["title"])}</h2>')
     if a['byline']:
-        names = ' · '.join(esc(x) for x in a['byline'])
+        names = ' · '.join(author_html(x) for x in a['byline'])
         p.append(f'<p class="byline"><img class="nib" src="{MARK_PEN}" alt="">'
                  f'<span>{names}</span></p>')
     p.append(f'<p class="rtime">{dev(read_minutes(a))} मिनिटं वाचन</p>')
@@ -142,7 +164,7 @@ def article_html(a, n, total):
         mail = (f'<a class="mail" href="mailto:{esc(tl["email"])}">'
                 f'{esc(tl["email"])}</a>')
         p.append(f'''<aside class="author">{photo}
-    <div><h4>{esc(tl['name'])}{role}</h4>{mail}{bio}</div></aside>''')
+    <div><h4>{author_html(tl['name'])}{role}</h4>{mail}{bio}</div></aside>''')
     if a['credit']:
         p.append(f'<p class="credit">{esc(a["credit"])}</p>')
 
@@ -268,6 +290,10 @@ main{max-width:var(--measure); margin:0 auto; padding:0 1.15rem 4rem;}
   margin:0 0 1rem; color:var(--ink); text-wrap:balance;}
 .byline{display:flex; align-items:center; gap:.55rem; margin:0;
   font-size:.98rem; font-weight:600; color:var(--moss);}
+.byline .who-link{color:inherit;text-decoration:underline;
+  text-decoration-color:var(--rule);text-underline-offset:3px}
+.author h4 .who-link{color:inherit;text-decoration:underline;
+  text-decoration-color:var(--rule);text-underline-offset:3px}
 .byline .nib{width:15px; flex:none; opacity:.85; filter:var(--linework);}
 .rtime{margin:.35rem 0 0 2.1rem; font-size:.85rem; color:var(--faint);}
 

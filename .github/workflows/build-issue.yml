@@ -68,6 +68,13 @@ jobs:
           PN_COVER: ${{ inputs.cover }}
         run: ./build.sh "${{ inputs.month }}"
 
+      - name: Update the author pages
+        # Runs before the web build so the issue's bylines can link to them.
+        # Reads the whole year from the site, so it picks up the new month too.
+        if: inputs.publish
+        working-directory: pipeline
+        run: python authors.py .. "${{ inputs.month }}"
+
       - name: Build the mobile web version
         working-directory: pipeline
         env:

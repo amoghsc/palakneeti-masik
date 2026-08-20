@@ -6,12 +6,9 @@ from bs4 import BeautifulSoup, NavigableString
 from issues import resolve, find_category
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-KEY = sys.argv[1] if len(sys.argv) > 1 else '2026-07'
-CFG = resolve(KEY)
-IDIR = os.path.join(BASE, 'data', KEY)
-IMGDIR = os.path.join(BASE, 'build', 'images', KEY)
-os.makedirs(IDIR, exist_ok=True)
-os.makedirs(IMGDIR, exist_ok=True)
+# Set when run as a script. Left as None when this module is imported purely
+# for its parsing helpers (see authors.py), which also disables image saving.
+KEY = CFG = IDIR = IMGDIR = None
 
 # ── fetch ───────────────────────────────────────────────────────────────
 # A bare "Mozilla/5.0" from a datacenter IP is exactly what a WAF blocks, so
@@ -45,60 +42,6 @@ def fetch_json(url):
             f'!! {url}\n   returned {ctype}, not JSON ({len(raw)} bytes).\n'
             f'   The site may be blocking this request. First 400 bytes:\n'
             f'   {head}')
-
-
-CAT = CFG.get('category')
-if not CAT:
-    found = find_category(KEY, fetch_json)
-    if not found:
-        raise SystemExit(
-            f'!! no WordPress category found for {KEY} ({CFG["month_en"]}).\n'
-            f'   Either the month is not published yet, or its category is '
-            f'named unusually — pass the id explicitly in issues.py.')
-    CAT = found['id']
-    print(f'   category: {found["name"]} (id {CAT}, {found["count"]} posts)')
-
-API = ('https://palakneeti.in/wp-json/wp/v2/posts'
-       f'?categories={CAT}&per_page=50&orderby=date&order=asc'
-       '&_fields=id,date,slug,link,title,content')
-
-
-def fetch_image(url):
-    """Download an image, normalising the name and converting formats that
-       PowerPoint cannot embed."""
-    if not url:
-        return None
-    # the path may contain Devanagari, which must be percent-encoded
-    parts = urllib.parse.urlsplit(url)
-    safe = urllib.parse.urlunsplit((
-        parts.scheme, parts.netloc,
-        urllib.parse.quote(parts.path, safe='/%'), parts.query, ''))
-
-    raw = os.path.basename(urllib.parse.unquote(parts.path))
-    name = re.sub(r'[^A-Za-z0-9._-]', '_', raw) or 'img'
-    path = os.path.join(IMGDIR, name)
-
-    if not os.path.exists(path):
-        try:
-            req = urllib.request.Request(safe, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=60) as r, open(path, 'wb') as f:
-                f.write(r.read())
-        except Exception as e:
-            print('  !! image failed:', url, e)
-            return None
-
-    # .webp cannot go into a .pptx — convert once, up front
-    if name.lower().endswith('.webp'):
-        png = os.path.splitext(path)[0] + '.png'
-        if not os.path.exists(png):
-            try:
-                from PIL import Image
-                Image.open(path).convert('RGBA').save(png)
-            except Exception as e:
-                print('  !! webp convert failed:', name, e)
-                return None
-        return os.path.basename(png)
-    return name
 
 
 # ── html -> blocks ──────────────────────────────────────────────────────
@@ -259,8 +202,74 @@ def normalize(title, slug, blocks, post):
             'tail': tail, 'credit': trailing_credit, 'appendix': appendix}
 
 
+def setup(key):
+    """Prepare the per-run paths and resolve the month's category."""
+    global KEY, CFG, IDIR, IMGDIR
+    KEY, CFG = key, resolve(key)
+    IDIR = os.path.join(BASE, 'data', key)
+    IMGDIR = os.path.join(BASE, 'build', 'images', key)
+    os.makedirs(IDIR, exist_ok=True)
+    os.makedirs(IMGDIR, exist_ok=True)
+    CAT = CFG.get('category')
+    if not CAT:
+        found = find_category(KEY, fetch_json)
+        if not found:
+            raise SystemExit(
+                f'!! no WordPress category found for {KEY} ({CFG["month_en"]}).\n'
+                f'   Either the month is not published yet, or its category is '
+                f'named unusually — pass the id explicitly in issues.py.')
+        CAT = found['id']
+        print(f'   category: {found["name"]} (id {CAT}, {found["count"]} posts)')
+
+    API = ('https://palakneeti.in/wp-json/wp/v2/posts'
+           f'?categories={CAT}&per_page=50&orderby=date&order=asc'
+           '&_fields=id,date,slug,link,title,content')
+
+    return API
+
+def fetch_image(url):
+    """Download an image, normalising the name and converting formats that
+       PowerPoint cannot embed."""
+    # IMGDIR is None when this module is imported only for its parsers, so
+    # nothing is downloaded and image blocks are simply skipped
+    if not url or not IMGDIR:
+        return None
+    # the path may contain Devanagari, which must be percent-encoded
+    parts = urllib.parse.urlsplit(url)
+    safe = urllib.parse.urlunsplit((
+        parts.scheme, parts.netloc,
+        urllib.parse.quote(parts.path, safe='/%'), parts.query, ''))
+
+    raw = os.path.basename(urllib.parse.unquote(parts.path))
+    name = re.sub(r'[^A-Za-z0-9._-]', '_', raw) or 'img'
+    path = os.path.join(IMGDIR, name)
+
+    if not os.path.exists(path):
+        try:
+            req = urllib.request.Request(safe, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=60) as r, open(path, 'wb') as f:
+                f.write(r.read())
+        except Exception as e:
+            print('  !! image failed:', url, e)
+            return None
+
+    # .webp cannot go into a .pptx — convert once, up front
+    if name.lower().endswith('.webp'):
+        png = os.path.splitext(path)[0] + '.png'
+        if not os.path.exists(png):
+            try:
+                from PIL import Image
+                Image.open(path).convert('RGBA').save(png)
+            except Exception as e:
+                print('  !! webp convert failed:', name, e)
+                return None
+        return os.path.basename(png)
+    return name
+
+
 def main():
-    posts = fetch_json(API)
+    api = setup(KEY_ARG)
+    posts = fetch_json(api)
     json.dump(posts, open(os.path.join(IDIR, 'raw.json'), 'w'), ensure_ascii=False)
     out = []
     for p in posts:
@@ -280,4 +289,6 @@ def main():
             print(f"      tail={a['tail']['name']} <{a['tail']['email']}> photo={a['tail']['photo']}")
 
 
-main()
+if __name__ == '__main__':
+    KEY_ARG = sys.argv[1] if len(sys.argv) > 1 else '2026-07'
+    main()

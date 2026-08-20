@@ -111,6 +111,7 @@ pipeline/          the build itself
   autofit.py       picks how tightly to set each article
   topptx.py        rebuilds the layout as an editable Canva/PowerPoint file
   web.py           builds the mobile web version
+  authors.py       builds a page per contributor from the whole year
   mksite.py        adds the month to the published site
   build.sh         runs the whole PDF build
 docs/              the published site (the tool writes here)
