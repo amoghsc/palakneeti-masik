@@ -1,0 +1,72 @@
+name: Preview a month
+
+# A dry run: shows which articles the tool can see for a month, without
+# building anything. Worth doing before a real build, so nobody is surprised
+# by a month that is only half published.
+on:
+  workflow_dispatch:
+    inputs:
+      month:
+        description: 'Month to look at, as YYYY-MM (e.g. 2026-09)'
+        required: true
+        type: string
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Look up the month
+        working-directory: pipeline
+        run: |
+          python - "${{ inputs.month }}" <<'PY' | tee preview.txt
+          import json, sys, urllib.request
+          from issues import resolve, find_category
+
+          key = sys.argv[1]
+          cfg = resolve(key)
+
+          def fetch(url):
+              req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  return json.load(r)
+
+          print(f"{cfg['month_mr']}  /  {cfg['month_en']}")
+          cat = cfg.get('category') or None
+          if not cat:
+              found = find_category(key, fetch)
+              if not found:
+                  print("\nNo category found for this month.")
+                  print("Either nothing is published yet, or the category is named")
+                  print("unusually on the site. Check the month, or ask for help.")
+                  raise SystemExit(0)
+              print(f"Category: {found['name']}  (id {found['id']})")
+              cat = found['id']
+
+          posts = fetch('https://palakneeti.in/wp-json/wp/v2/posts'
+                        f'?categories={cat}&per_page=50&orderby=date&order=asc'
+                        '&_fields=id,date,title,link')
+          print(f"\n{len(posts)} article(s):\n")
+          for i, p in enumerate(posts, 1):
+              import html as h
+              t = h.unescape(p['title']['rendered'])
+              print(f"  {i}. {t}")
+              print(f"     {p['date'][:10]}   {p['link']}")
+          print("\nA full issue is usually 5-7 articles. If this looks short,")
+          print("the month is probably still being published.")
+          PY
+
+      - name: Summary
+        run: |
+          {
+            echo "## ${{ inputs.month }}"
+            echo '```'
+            cat pipeline/preview.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,22 @@
+# fetched article data and build intermediates — regenerated on every run
+pipeline/data/
+pipeline/build/images/
+pipeline/build/issue-*.html
+pipeline/build/web-*.html
+pipeline/build/*.pdf
+pipeline/build/*.pptx
+pipeline/build/layout-*.json
+pipeline/build/pagemap-*.json
+pipeline/build/tighten-*.json
+pipeline/build/fitstats-*.json
+pipeline/build/shot-*.png
+pipeline/build/cmp_*.png
+pipeline/build/diff_*.png
+# created by the workflows themselves
+out/
+pipeline/fetch.log
+pipeline/preview.txt
+
+__pycache__/
+*.pyc
+.venv/

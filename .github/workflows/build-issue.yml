@@ -1,0 +1,144 @@
+name: Build issue
+
+# Editors run this from the Actions tab: pick a month, press Run.
+on:
+  workflow_dispatch:
+    inputs:
+      month:
+        description: 'Month to build, as YYYY-MM (e.g. 2026-09)'
+        required: true
+        type: string
+      style:
+        description: 'Page layout'
+        required: true
+        default: classic
+        type: choice
+        options: [classic, editorial, twocol]
+      cover:
+        description: 'Cover page'
+        required: true
+        default: title
+        type: choice
+        options: [title, blank]
+      publish:
+        description: 'Publish the mobile web version to the site'
+        required: true
+        default: true
+        type: boolean
+
+concurrency:
+  group: build-issue
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the month looks like YYYY-MM
+        run: |
+          echo "${{ inputs.month }}" | grep -Eq '^[0-9]{4}-[0-9]{2}' \
+            || { echo "::error::Month must look like 2026-09"; exit 1; }
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Find Chrome
+        id: chrome
+        run: |
+          for c in google-chrome google-chrome-stable chromium-browser chromium; do
+            if command -v "$c" >/dev/null 2>&1; then
+              echo "CHROME=$(command -v $c)" >> "$GITHUB_ENV"
+              "$c" --version
+              exit 0
+            fi
+          done
+          echo "No Chrome on the runner — installing Chromium"
+          sudo apt-get update -qq && sudo apt-get install -y -qq chromium-browser
+          echo "CHROME=$(command -v chromium-browser)" >> "$GITHUB_ENV"
+
+      - name: Fetch the month's articles
+        working-directory: pipeline
+        run: python fetchparse.py "${{ inputs.month }}" | tee fetch.log
+
+      - name: Build the A4 PDF and the Canva file
+        working-directory: pipeline
+        env:
+          PN_STYLE: ${{ inputs.style }}
+          PN_COVER: ${{ inputs.cover }}
+        run: ./build.sh "${{ inputs.month }}"
+
+      - name: Build the mobile web version
+        working-directory: pipeline
+        env:
+          PN_STYLE: ${{ inputs.style }}
+          PN_COVER: ${{ inputs.cover }}
+        run: python web.py "${{ inputs.month }}"
+
+      - name: Collect the outputs
+        id: out
+        working-directory: pipeline
+        env:
+          PN_STYLE: ${{ inputs.style }}
+          PN_COVER: ${{ inputs.cover }}
+        run: |
+          KEY="${{ inputs.month }}"
+          NAME=$(python -c "from issues import resolve; print(resolve('$KEY')['out'])")
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          mkdir -p ../out
+          cp "build/$NAME.pdf" ../out/
+          # the Canva file is optional — the build warns and skips it if the
+          # layout extraction misbehaves, and that must not fail the run
+          if [ -f "build/${NAME}_canva.pptx" ]; then
+            cp "build/${NAME}_canva.pptx" ../out/
+          else
+            echo "::warning::Canva file was not produced; the PDF is unaffected."
+          fi
+          if [ "${{ inputs.publish }}" = "true" ]; then
+            mkdir -p "../docs/$KEY"
+            cp "build/web-$KEY.html" "../docs/$KEY/index.html"
+            cp "build/$NAME.pdf" "../docs/$KEY/"
+            python mksite.py "$KEY" ..
+          fi
+
+      - name: Upload the PDF and Canva file
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.out.outputs.name }}
+          path: out/*
+          retention-days: 90
+
+      - name: Publish the web version
+        if: inputs.publish
+        run: |
+          git config user.name  "palakneeti-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs
+          if git diff --cached --quiet; then
+            echo "Nothing changed on the site."
+          else
+            git commit -m "अंक ${{ inputs.month }} — mobile edition"
+            git push
+          fi
+
+      - name: Summary
+        run: |
+          {
+            echo "## पालकनीती ${{ inputs.month }}"
+            echo
+            sed -n 's/^/    /p' pipeline/fetch.log | head -30
+            echo
+            echo "Layout: \`${{ inputs.style }}\`  ·  Cover: \`${{ inputs.cover }}\`"
+            echo
+            echo "The PDF and the Canva file are under **Artifacts** at the bottom of this page."
+            if [ "${{ inputs.publish }}" = "true" ]; then
+              echo "The mobile edition is published to the site (give Pages a minute)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
