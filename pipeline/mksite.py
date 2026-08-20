@@ -121,6 +121,9 @@ if __name__ == '__main__':
     m = record()
     issues = all_issues()
     os.makedirs(DOCS, exist_ok=True)
+    # these are plain static pages; Jekyll only gets in the way (and fails on
+    # Liquid-looking syntax inside the CSS and script)
+    open(os.path.join(DOCS, '.nojekyll'), 'w').close()
     open(os.path.join(DOCS, 'index.html'), 'w', encoding='utf-8').write(index(issues))
     print(f'recorded {KEY}: {m["articles"]} articles; '
           f'index now lists {len(issues)} issue(s)')
