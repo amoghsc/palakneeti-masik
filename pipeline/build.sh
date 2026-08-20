@@ -13,6 +13,14 @@ if [ -z "$CHROME" ]; then
   done
 fi
 [ -n "$CHROME" ] || { echo "!! no Chrome/Chromium found; set \$CHROME"; exit 1; }
+
+# A CI runner has no writable profile dir and a tiny /dev/shm, and Chrome
+# exits immediately without these. Keep them in one place for both callers.
+CHROME_PROFILE="$(mktemp -d)"
+trap 'rm -rf "$CHROME_PROFILE"' EXIT
+CHROME_FLAGS="--headless=new --disable-gpu --no-sandbox --disable-dev-shm-usage
+  --allow-file-access-from-files --no-first-run --no-default-browser-check
+  --disable-extensions --hide-scrollbars --user-data-dir=$CHROME_PROFILE"
 # use a local venv when there is one, otherwise whatever python is on PATH
 if [ -x ./.venv/bin/python ]; then PY=./.venv/bin/python; else PY="$(command -v python3 || command -v python)"; fi
 [ -n "$PY" ] || { echo "!! no python found"; exit 1; }
@@ -23,12 +31,15 @@ OUTNAME=$($PY -c "from issues import resolve; print(resolve('$KEY')['out'])")
 grab () {
   local url="$1" marker="$2" out="$3"
   for b in 120000 300000 600000 200000 400000; do
-    "$CHROME" --headless=new --disable-gpu --no-sandbox \
-      --allow-file-access-from-files --virtual-time-budget=$b \
-      --dump-dom "$url" 2>/dev/null > /tmp/_grab.html || true
+    "$CHROME" $CHROME_FLAGS --virtual-time-budget=$b \
+      --dump-dom "$url" 2>/tmp/_grab.err > /tmp/_grab.html || true
     if grep -q "$marker" /tmp/_grab.html; then cp /tmp/_grab.html "$out"; return 0; fi
   done
-  echo "!! never saw $marker"; return 1
+  echo "!! never saw $marker"
+  echo "   Chrome wrote $(wc -c < /tmp/_grab.html | tr -d ' ') bytes of DOM. Last errors:"
+  grep -viE "dbus|Fontconfig|GLES|Vulkan|libva|DevTools listening" /tmp/_grab.err \
+    | tail -8 | sed 's/^/   | /'
+  return 1
 }
 
 paginate () {
@@ -58,9 +69,8 @@ print(max(pm['end'].values()))")
 
 printed=0
 for b in 120000 300000 60000 600000; do
-  "$CHROME" --headless=new --disable-gpu --no-sandbox --allow-file-access-from-files \
-    --virtual-time-budget=$b --no-pdf-header-footer \
-    --print-to-pdf="build/$OUTNAME.pdf" "file://$PWD/build/issue-$KEY.html" 2>/dev/null || true
+  "$CHROME" $CHROME_FLAGS --virtual-time-budget=$b --no-pdf-header-footer \
+    --print-to-pdf="build/$OUTNAME.pdf" "file://$PWD/build/issue-$KEY.html" 2>/tmp/_print.err || true
   got=$($PY -c "
 from pypdf import PdfReader
 try: print(len(PdfReader('build/$OUTNAME.pdf').pages))
