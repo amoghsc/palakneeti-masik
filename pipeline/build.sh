@@ -3,48 +3,17 @@
 set -e
 cd "$(dirname "$0")"
 KEY="${1:-2026-07}"
-# Chrome is required for pagination and printing. Honour $CHROME, else look
-# in the usual places on macOS and Linux (CI runners have it on PATH).
-if [ -z "$CHROME" ]; then
-  for c in "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-           "/Applications/Chromium.app/Contents/MacOS/Chromium" \
-           google-chrome google-chrome-stable chromium chromium-browser; do
-    if command -v "$c" >/dev/null 2>&1 || [ -x "$c" ]; then CHROME="$c"; break; fi
-  done
-fi
-[ -n "$CHROME" ] || { echo "!! no Chrome/Chromium found; set \$CHROME"; exit 1; }
 
-# A CI runner has no writable profile dir and a tiny /dev/shm, and Chrome
-# exits immediately without these. Keep them in one place for both callers.
-CHROME_PROFILE="$(mktemp -d)"
-trap 'rm -rf "$CHROME_PROFILE"' EXIT
-CHROME_FLAGS="--headless=new --disable-gpu --no-sandbox --disable-dev-shm-usage
-  --allow-file-access-from-files --no-first-run --no-default-browser-check
-  --disable-extensions --hide-scrollbars --user-data-dir=$CHROME_PROFILE"
 # use a local venv when there is one, otherwise whatever python is on PATH
 if [ -x ./.venv/bin/python ]; then PY=./.venv/bin/python; else PY="$(command -v python3 || command -v python)"; fi
 [ -n "$PY" ] || { echo "!! no python found"; exit 1; }
 OUTNAME=$($PY -c "from issues import resolve; print(resolve('$KEY')['out'])")
 
-# Headless Chrome sometimes tears down before Paged.js finishes, so each read
-# is retried across a few virtual-time budgets until it yields a result.
-grab () {
-  local url="$1" marker="$2" out="$3"
-  for b in 120000 300000 600000 200000 400000; do
-    "$CHROME" $CHROME_FLAGS --virtual-time-budget=$b \
-      --dump-dom "$url" 2>/tmp/_grab.err > /tmp/_grab.html || true
-    if grep -q "$marker" /tmp/_grab.html; then cp /tmp/_grab.html "$out"; return 0; fi
-  done
-  echo "!! never saw $marker"
-  echo "   Chrome wrote $(wc -c < /tmp/_grab.html | tr -d ' ') bytes of DOM. Last errors:"
-  grep -viE "dbus|Fontconfig|GLES|Vulkan|libva|DevTools listening" /tmp/_grab.err \
-    | tail -8 | sed 's/^/   | /'
-  return 1
-}
-
+# Pagination and printing go through Playwright (see render.py): it waits for
+# the page to actually finish rather than guessing with a time budget.
 paginate () {
   $PY gen.py "$KEY" "$@" >/dev/null
-  grab "file://$PWD/build/issue-$KEY.html" 'PAGEMAP{' /tmp/pg.html
+  $PY render.py dom "file://$PWD/build/issue-$KEY.html" > /tmp/pg.html
   grep -o 'PAGEMAP{.*}' /tmp/pg.html | head -1 | sed 's/^PAGEMAP//' > "build/pagemap-$KEY.json"
   test -s "build/pagemap-$KEY.json"
 }
@@ -61,29 +30,22 @@ $PY autofit.py choose "$KEY"
 echo "── contents page numbers + PDF"
 paginate --with-toc
 $PY gen.py "$KEY" --with-toc >/dev/null
-# expected length, so a print that raced the paginator can be detected
+$PY render.py pdf "file://$PWD/build/issue-$KEY.html" "build/$OUTNAME.pdf"
+GOT=$($PY -c "
+from pypdf import PdfReader
+print(len(PdfReader('build/$OUTNAME.pdf').pages))")
 WANT=$(KEY="$KEY" $PY -c "
 import json, os
 pm = json.load(open('build/pagemap-%s.json' % os.environ['KEY']))
 print(max(pm['end'].values()))")
-
-printed=0
-for b in 120000 300000 60000 600000; do
-  "$CHROME" $CHROME_FLAGS --virtual-time-budget=$b --no-pdf-header-footer \
-    --print-to-pdf="build/$OUTNAME.pdf" "file://$PWD/build/issue-$KEY.html" 2>/tmp/_print.err || true
-  got=$($PY -c "
-from pypdf import PdfReader
-try: print(len(PdfReader('build/$OUTNAME.pdf').pages))
-except Exception: print(0)")
-  if [ "$got" -ge "$WANT" ]; then printed=1; echo "   printed $got pages"; break; fi
-  echo "   retry: got $got, expected $WANT"
-done
-[ "$printed" = 1 ] || { echo "!! could not print a complete PDF"; exit 1; }
+[ "$GOT" -ge "$WANT" ] || { echo "!! printed $GOT pages, expected $WANT"; exit 1; }
+echo "   printed $GOT pages"
 
 echo "── editable layout + .pptx"
 # The PDF and the web edition are the outputs that matter. If the layout
 # extraction misbehaves, warn and carry on rather than losing the whole build.
-if ! grab "file://$PWD/build/issue-$KEY.html#extract" 'LAYOUT\[' /tmp/ex.html; then
+if ! $PY render.py dom "file://$PWD/build/issue-$KEY.html#extract" > /tmp/ex.html \
+     || ! grep -q 'LAYOUT\[' /tmp/ex.html; then
   echo "!! could not extract the editable layout — skipping the Canva file."
   echo "   The PDF is fine. Re-run if you need the .pptx."
   SKIP_PPTX=1

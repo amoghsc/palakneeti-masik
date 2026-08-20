@@ -50,19 +50,10 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - name: Find Chrome
-        id: chrome
-        run: |
-          for c in google-chrome google-chrome-stable chromium-browser chromium; do
-            if command -v "$c" >/dev/null 2>&1; then
-              echo "CHROME=$(command -v $c)" >> "$GITHUB_ENV"
-              "$c" --version
-              exit 0
-            fi
-          done
-          echo "No Chrome on the runner — installing Chromium"
-          sudo apt-get update -qq && sudo apt-get install -y -qq chromium-browser
-          echo "CHROME=$(command -v chromium-browser)" >> "$GITHUB_ENV"
+      - name: Install the browser
+        # Playwright ships a pinned Chromium, so the build does not depend on
+        # whatever Chrome version the runner image happens to carry
+        run: python -m playwright install --with-deps chromium
 
       - name: Fetch the month's articles
         working-directory: pipeline

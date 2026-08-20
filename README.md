@@ -113,9 +113,10 @@ Only needed for development.
 
 ```bash
 python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
+./.venv/bin/playwright install chromium
 cd pipeline
 ./.venv/bin/python fetchparse.py 2026-09
-./build.sh 2026-09          # needs Google Chrome installed
+./build.sh 2026-09          # browser comes from playwright install chromium
 ./.venv/bin/python web.py 2026-09
 ```
 
