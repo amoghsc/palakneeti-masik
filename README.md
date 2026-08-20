@@ -41,7 +41,7 @@ is still being published, so wait.
 | Field | What to pick |
 |---|---|
 | **Month** | `2026-09` |
-| **Page layout** | `classic` (single column, like the printed issues) · `editorial` (deeper green, left-aligned titles) · `twocol` (two columns) |
+| **Page layout** | `twocol` (two columns — the default) · `classic` (single column, like the older printed issues) · `editorial` (deeper green, left-aligned titles) |
 | **Cover page** | `title` puts the magazine name and month on the cover · `blank` leaves it empty for your own artwork |
 | **Publish the mobile web version** | leave ticked |
 

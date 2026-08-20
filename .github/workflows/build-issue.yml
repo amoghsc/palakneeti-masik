@@ -11,9 +11,9 @@ on:
       style:
         description: 'Page layout'
         required: true
-        default: classic
+        default: twocol
         type: choice
-        options: [classic, editorial, twocol]
+        options: [twocol, classic, editorial]
       cover:
         description: 'Cover page'
         required: true
