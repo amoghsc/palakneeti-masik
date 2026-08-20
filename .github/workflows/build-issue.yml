@@ -57,7 +57,9 @@ jobs:
 
       - name: Fetch the month's articles
         working-directory: pipeline
-        run: python fetchparse.py "${{ inputs.month }}" | tee fetch.log
+        run: |
+          set -o pipefail    # otherwise tee's exit code hides a failed fetch
+          python fetchparse.py "${{ inputs.month }}" | tee fetch.log
 
       - name: Build the A4 PDF and the Canva file
         working-directory: pipeline

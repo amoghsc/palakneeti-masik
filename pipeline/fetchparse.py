@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Fetch one month's articles from palakneeti.in and turn them into the
    structured form the layout needs.   usage: fetchparse.py <issue-key>"""
-import json, os, re, sys, urllib.request, urllib.parse
+import json, os, re, sys, urllib.request, urllib.parse, urllib.error
 from bs4 import BeautifulSoup, NavigableString
 from issues import resolve, find_category
 
@@ -14,10 +14,37 @@ os.makedirs(IDIR, exist_ok=True)
 os.makedirs(IMGDIR, exist_ok=True)
 
 # ── fetch ───────────────────────────────────────────────────────────────
+# A bare "Mozilla/5.0" from a datacenter IP is exactly what a WAF blocks, so
+# ask the way a browser would.
+HEADERS = {
+    'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+                   'AppleWebKit/537.36 (KHTML, like Gecko) '
+                   'Chrome/126.0.0.0 Safari/537.36'),
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Language': 'en-GB,en;q=0.9,mr;q=0.8',
+    'Referer': 'https://palakneeti.in/',
+}
+
+
 def fetch_json(url):
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.load(r)
+    req = urllib.request.Request(url, headers=HEADERS)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            raw = r.read()
+            ctype = r.headers.get('Content-Type', '?')
+    except urllib.error.HTTPError as e:
+        body = e.read()[:400].decode('utf-8', 'replace')
+        raise SystemExit(f'!! {url}\n   HTTP {e.code} {e.reason}\n   {body}')
+    except urllib.error.URLError as e:
+        raise SystemExit(f'!! {url}\n   could not connect: {e.reason}')
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        head = raw[:400].decode('utf-8', 'replace').replace('\n', ' ')
+        raise SystemExit(
+            f'!! {url}\n   returned {ctype}, not JSON ({len(raw)} bytes).\n'
+            f'   The site may be blocking this request. First 400 bytes:\n'
+            f'   {head}')
 
 
 CAT = CFG.get('category')
@@ -53,7 +80,7 @@ def fetch_image(url):
 
     if not os.path.exists(path):
         try:
-            req = urllib.request.Request(safe, headers={'User-Agent': 'Mozilla/5.0'})
+            req = urllib.request.Request(safe, headers=HEADERS)
             with urllib.request.urlopen(req, timeout=60) as r, open(path, 'wb') as f:
                 f.write(r.read())
         except Exception as e:
