@@ -314,8 +314,10 @@ def featured_urls(posts):
         return {}
     got = fetch_json('https://palakneeti.in/wp-json/wp/v2/media'
                      f'?include={",".join(str(i) for i in ids)}'
-                     '&per_page=100&_fields=id,source_url')
-    return {m['id']: m['source_url'] for m in got}
+                     '&per_page=100&_fields=id,source_url,mime_type')
+    # some posts use the issue's cover PDF as their featured media
+    return {m['id']: m['source_url'] for m in got
+            if (m.get('mime_type') or '').startswith('image/')}
 
 
 def add_lead_image(blocks, url):

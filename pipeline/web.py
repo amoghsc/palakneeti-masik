@@ -65,7 +65,12 @@ dev = lambda n: ''.join(DEV[int(c)] for c in str(n))
 
 # ── images: everything is inlined, so everything gets resized first ──────
 def data_uri(path, box, square=False, quality=72):
-    im = Image.open(path)
+    # one unreadable file must not take the whole issue down
+    try:
+        im = Image.open(path)
+    except Exception as e:
+        print(f'   !! skipping unreadable image {os.path.basename(path)}: {e}')
+        return ''
     if im.mode in ('RGBA', 'LA', 'P'):
         im = im.convert('RGBA')
         bg = Image.new('RGB', im.size, (255, 255, 255))
@@ -139,6 +144,8 @@ def block_html(b):
         if not b.get('file'):        # nothing was downloaded for this one
             return ''
         src = data_uri(os.path.join(IMGDIR, b['file']), 900)
+        if not src:
+            return ''
         cap = (f'<figcaption>{esc(b["caption"])}</figcaption>'
                if b.get('caption') else '')
         return f'<figure><img src="{src}" alt="" loading="lazy">{cap}</figure>'
@@ -188,7 +195,7 @@ def article_html(a, n, total):
         photo = ''
         if tl['photo']:
             src = data_uri(os.path.join(IMGDIR, tl['photo']), 240, square=True)
-            photo = f'<img src="{src}" alt="" loading="lazy">'
+            photo = f'<img src="{src}" alt="" loading="lazy">' if src else ''
         role = f'<span class="role">{esc(tl["role"])}</span>' if tl.get('role') else ''
         bio = f'<p>{esc(tl["bio"])}</p>' if tl['bio'] else ''
         mail = (f'<a class="mail" href="mailto:{esc(tl["email"])}">'
