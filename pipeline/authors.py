@@ -10,12 +10,14 @@ author has to be read out of the article itself.
 """
 import hashlib, html as H, json, os, re, sys, datetime
 import fetchparse as fp
+import chrome
 
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else '..')
 # accepts a year ("2026") or a month key ("2026-08"), so the workflow can
 # pass whatever it already has
 _arg = sys.argv[2] if len(sys.argv) > 2 else ''
 YEAR = int(_arg.split('-')[0]) if _arg else datetime.date.today().year
+FIRST_YEAR = 2025                          # how far back the index reaches
 DOCS = os.path.join(ROOT, 'docs')
 OUT = os.path.join(DOCS, 'authors')
 esc = lambda t: H.escape(str(t), quote=False)
@@ -66,13 +68,24 @@ def slug_for(person):
     return 'p-' + h
 
 
-def fetch_year(year):
-    return fp.fetch_json(
-        'https://palakneeti.in/wp-json/wp/v2/posts'
-        f'?categories={MASIK}&after={year - 1}-12-31T23:59:59'
-        f'&before={year + 1}-01-01T00:00:00'
-        '&per_page=100&orderby=date&order=desc'
-        '&_fields=id,date,slug,link,title,content')
+def fetch_years(first, last):
+    """Every masik article between two years, following pagination."""
+    out, page = [], 1
+    while True:
+        batch = fp.fetch_json(
+            'https://palakneeti.in/wp-json/wp/v2/posts'
+            f'?categories={MASIK}&after={first - 1}-12-31T23:59:59'
+            f'&before={last + 1}-01-01T00:00:00'
+            f'&per_page=100&page={page}&orderby=date&order=desc'
+            '&_fields=id,date,slug,link,title,content')
+        out += batch
+        if len(batch) < 100:
+            return out
+        page += 1
+
+
+def fetch_year(year):                      # kept for one-year callers
+    return fetch_years(year, year)
 
 
 def analyse(posts):
@@ -186,27 +199,16 @@ def analyse(posts):
     return people, articles
 
 
-CSS = """
-:root{--paper:#F6F8F4;--surface:#EDF1EA;--ink:#16211D;--soft:#56685F;
- --faint:#7C8C84;--moss:#1F5A4C;--clay:#BC5D2C;--rule:#DBE3DA;
- --serif:'Tiro Devanagari Marathi','Noto Serif Devanagari',Georgia,serif;
- --sans:'Mukta','Noto Sans Devanagari',system-ui,sans-serif;}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
- --paper:#101613;--surface:#18211D;--ink:#E6EBE4;--soft:#9DACA3;
- --faint:#7E8D85;--moss:#7CC4AB;--clay:#E4885C;--rule:#25322C;}}
-:root[data-theme="dark"]{--paper:#101613;--surface:#18211D;--ink:#E6EBE4;
- --soft:#9DACA3;--faint:#7E8D85;--moss:#7CC4AB;--clay:#E4885C;--rule:#25322C;}
-*{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
- font-size:17px;line-height:1.72;-webkit-text-size-adjust:100%}
-main{max-width:34rem;margin:0 auto;padding:2.4rem 1.15rem 4rem}
-.crumb{font-size:.86rem;color:var(--faint);margin:0 0 1.4rem}
+PAGE_CSS = """
+/* the palette, bar and controls come from chrome.py */
+.crumb{font-size:.86rem;color:var(--faint);margin:1.6rem 0 1.2rem}
 .crumb a{color:var(--soft);text-decoration:none}
-h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.6rem);
+.crumb a:hover{color:var(--moss)}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
-.tag{color:var(--faint);margin:0 0 2rem;font-size:.92rem}
+.tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
- margin:0 0 2rem;font-size:.95rem;color:var(--soft)}
+ margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
 .who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
  justify-content:space-between;align-items:baseline;gap:1rem}
@@ -216,6 +218,8 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.6rem);
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
+.yr{font-family:var(--sans);font-size:.78rem;letter-spacing:.16em;
+ text-transform:uppercase;color:var(--faint);margin:1.8rem 0 .2rem}
 ol.arts{list-style:none;margin:0;padding:0}
 ol.arts li{border-top:1px solid var(--rule);padding:1rem 0}
 ol.arts li:last-child{border-bottom:1px solid var(--rule)}
@@ -225,51 +229,49 @@ ol.arts a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
 .meta{margin-top:.3rem;font-size:.85rem;color:var(--faint)}
 .meta .role{color:var(--clay)}
 .out{font-size:.78rem;color:var(--faint);margin-left:.35rem}
-footer{margin-top:3rem;padding-top:1.4rem;border-top:1px solid var(--rule);
+footer{margin-top:2.6rem;padding-top:1.4rem;border-top:1px solid var(--rule);
  color:var(--faint);font-size:.87rem}
 footer a{color:var(--moss)}
 """
 
 
-def shell(title, body, depth):
-    up = '../' * depth
-    return f'''<!doctype html>
-<html lang="mr"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(title)}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700&family=Tiro+Devanagari+Marathi&display=swap">
-<style>{CSS}</style></head>
-<body><main>
-<p class="crumb"><a href="{up}">← पालकनीती मासिक</a></p>
-{body}
-<footer><p>लेख <a href="https://palakneeti.in" target="_blank" rel="noopener">palakneeti.in</a>
-वर उघडतील. ही यादी त्या संकेतस्थळावरून आपोआप तयार होते.</p></footer>
-</main></body></html>
-'''
+def shell(title, body, home, label):
+    inner = (f'<main><p class="crumb"><a href="{home}">← पालकनीती मासिक</a></p>'
+             f'{body}'
+             f'<footer><p>लेख <a href="https://palakneeti.in" target="_blank"'
+             f' rel="noopener">palakneeti.in</a> वर उघडतील. ही यादी त्या'
+             f' संकेतस्थळावरून आपोआप तयार होते.</p>'
+             f'<p><a class="backlink" href="{home}">← सगळे अंक</a></p></footer></main>')
+    return chrome.page(title, PAGE_CSS, inner, home=home, label=label,
+                       progress=False)
 
 
 def article_list(items):
-    out = []
+    """Grouped by year, newest first."""
+    out, year = [], None
     for it in items:
         y, m, _ = it['date'].split('-')
+        if y != year:
+            if year is not None:
+                out.append('</ol>')
+            out.append(f'<p class="yr">{dev(y)}</p><ol class="arts">')
+            year = y
         role = (f'<span class="role">{esc(it["role"])}</span> · '
                 if it['role'] and it['role'] != 'लेखन' else '')
-        out.append(f'''<li>
-  <a href="{esc(it['link'])}" target="_blank" rel="noopener">{esc(it['title'])}<span class="out">↗</span></a>
-  <div class="meta">{role}{MONTHS_MR[int(m) - 1]} {dev(y)}</div>
-</li>''')
-    return '<ol class="arts">' + '\n'.join(out) + '</ol>'
+        out.append(f'<li><a href="{esc(it["link"])}" target="_blank"'
+                   f' rel="noopener">{esc(it["title"])}<span class="out">↗</span></a>'
+                   f'<div class="meta">{role}{MONTHS_MR[int(m) - 1]}</div></li>')
+    out.append('</ol>')
+    return '\n'.join(out)
 
 
 def build():
-    posts = fetch_year(YEAR)
+    posts = fetch_years(FIRST_YEAR, YEAR)
     people, articles = analyse(posts)
     os.makedirs(OUT, exist_ok=True)
+    span = (f'{dev(FIRST_YEAR)}–{dev(YEAR)}' if YEAR > FIRST_YEAR else dev(YEAR))
 
-    ranked = sorted(people.values(),
-                    key=lambda p: (-len(p['items']), p['name']))
+    ranked = sorted(people.values(), key=lambda p: (-len(p['items']), p['name']))
 
     for p in ranked:
         d = os.path.join(OUT, p['slug'])
@@ -280,30 +282,29 @@ def build():
                     f'{esc(p["email"])}</a></p>' if p['email'] else '')
             bio = f'<div class="bio">{esc(p["bio"])}{mail}</div>'
         body = (f'<h1>{esc(p["name"])}</h1>'
-                f'<p class="tag">{dev(len(p["items"]))} लेख · {dev(YEAR)}</p>'
+                f'<p class="tag">{dev(len(p["items"]))} लेख · {span}</p>'
                 f'{bio}{article_list(p["items"])}')
         open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(
-            shell(f'{p["name"]} — पालकनीती', body, 3))
+            shell(f'{p["name"]} — पालकनीती', body, '../../', p['name']))
 
     rows = ''.join(
         f'<div class="who"><a href="{p["slug"]}/">{esc(p["name"])}</a>'
         f'<span class="n">{dev(len(p["items"]))} लेख</span></div>'
         for p in ranked)
     attributed = sum(1 for _, f in articles if f)
-    body = (f'<h1>लेखक</h1><p class="tag">{dev(YEAR)} मधले '
-            f'{dev(len(ranked))} लेखक · {dev(len(posts))} लेख</p>{rows}')
+    body = (f'<h1>लेखक</h1><p class="tag">{span} · {dev(len(ranked))} लेखक · '
+            f'{dev(len(posts))} लेख</p>{rows}')
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(
-        shell('लेखक — पालकनीती', body, 2))
+        shell('लेखक — पालकनीती', body, '../', 'लेखक'))
 
-    # web.py uses this to turn bylines into links
     json.dump({p['name']: p['slug'] for p in ranked},
               open(os.path.join(OUT, 'map.json'), 'w'), ensure_ascii=False)
 
-    print(f'  {len(posts)} articles in {YEAR}; {attributed} attributed, '
+    print(f'  {len(posts)} articles {span}; {attributed} attributed, '
           f'{len(posts) - attributed} without a named author')
     print(f'  {len(ranked)} contributors')
     for p in ranked[:8]:
-        print(f'    {len(p["items"]):2}  {p["name"]}  → authors/{p["slug"]}/')
+        print(f'    {len(p["items"]):3}  {p["name"]}  → authors/{p["slug"]}/')
 
 
 if __name__ == '__main__':

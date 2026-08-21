@@ -9,6 +9,7 @@ rebuilt from what is actually on disk.
 """
 import html, json, os, sys, datetime
 from issues import resolve
+import chrome
 
 KEY = sys.argv[1]
 ROOT = os.path.abspath(sys.argv[2] if len(sys.argv) > 2 else '..')
@@ -50,22 +51,11 @@ def all_issues():
 
 
 INDEX_CSS = """
-:root{--paper:#F6F8F4;--surface:#EDF1EA;--ink:#16211D;--soft:#56685F;
- --faint:#7C8C84;--moss:#1F5A4C;--clay:#BC5D2C;--rule:#DBE3DA;
- --serif:'Tiro Devanagari Marathi','Noto Serif Devanagari',Georgia,serif;
- --sans:'Mukta','Noto Sans Devanagari',system-ui,sans-serif;}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
- --paper:#101613;--surface:#18211D;--ink:#E6EBE4;--soft:#9DACA3;
- --faint:#7E8D85;--moss:#7CC4AB;--clay:#E4885C;--rule:#25322C;}}
-:root[data-theme="dark"]{--paper:#101613;--surface:#18211D;--ink:#E6EBE4;
- --soft:#9DACA3;--faint:#7E8D85;--moss:#7CC4AB;--clay:#E4885C;--rule:#25322C;}
-*{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
- font-size:17px;line-height:1.7;-webkit-text-size-adjust:100%}
-main{max-width:34rem;margin:0 auto;padding:3rem 1.15rem 4rem}
-h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.4rem,11vw,3.2rem);
- margin:0;color:var(--moss);line-height:1.05;text-align:center}
-.tag{margin:.8rem 0 2.6rem;text-align:center;color:var(--faint);font-size:.9rem;
+/* the palette, bar and controls come from chrome.py */
+.top{padding:2.6rem 0 1.8rem;text-align:center}
+.top h1{font-family:var(--serif);font-weight:400;
+ font-size:clamp(2.3rem,11vw,3rem);margin:0;color:var(--moss);line-height:1.05}
+.top .tag{margin:.7rem 0 0;color:var(--faint);font-size:.88rem;
  letter-spacing:.15em;text-transform:uppercase}
 .issue{border-top:1px solid var(--rule);padding:1.3rem 0}
 .issue:last-of-type{border-bottom:1px solid var(--rule)}
@@ -79,7 +69,12 @@ h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.4rem,11vw,3.2rem);
 .pdf{border:1px solid var(--rule);color:var(--soft)}
 .titles{margin:.7rem 0 0;padding-left:1.1rem;color:var(--soft);font-size:.88rem}
 .titles li{margin:.15rem 0}
-footer{margin-top:3rem;text-align:center;color:var(--faint);font-size:.85rem}
+.more-row{margin-top:2rem;display:flex;gap:.6rem;flex-wrap:wrap}
+.more-row a{display:inline-block;text-decoration:none;font-size:.9rem;
+ font-weight:600;padding:.5rem 1rem;border-radius:999px;
+ border:1px solid var(--rule);color:var(--moss)}
+footer{margin-top:2.6rem;padding-top:1.4rem;border-top:1px solid var(--rule);
+ color:var(--faint);font-size:.87rem;text-align:center}
 footer a{color:var(--moss)}
 .empty{color:var(--soft);text-align:center;padding:2rem 0}
 """
@@ -91,34 +86,30 @@ def index(issues):
         pdf = (f'<a class="pdf" href="{esc(m["key"])}/{esc(m["pdf"])}">PDF</a>'
                if m.get('pdf') else '')
         titles = ''.join(f'<li>{esc(t)}</li>' for t in m.get('titles', [])[:8])
-        rows.append(f'''<section class="issue">
+        rows.append(f"""<section class="issue">
   <h2>{esc(m['month_mr'])}</h2>
   <p class="meta">{esc(m['articles'])} लेख · {esc(m['month_en'])}</p>
-  <div class="links">
-    <a class="read" href="{esc(m['key'])}/">वाचा</a>{pdf}
-  </div>
+  <div class="links"><a class="read" href="{esc(m['key'])}/">वाचा</a>{pdf}</div>
   <ul class="titles">{titles}</ul>
-</section>''')
+</section>""")
     body = '\n'.join(rows) or '<p class="empty">अजून एकही अंक तयार झालेला नाही.</p>'
+
+    extra = []
     if os.path.isdir(os.path.join(DOCS, 'authors')):
-        body += ('<p style="margin-top:2rem"><a class="read" style="display:inline-block"'
-                 ' href="authors/">लेखकांनुसार सगळे लेख →</a></p>')
-    return f'''<!doctype html>
-<html lang="mr"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>पालकनीती मासिक</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700&family=Tiro+Devanagari+Marathi&display=swap">
-<style>{INDEX_CSS}</style></head>
-<body><main>
-  <h1>पालकनीती</h1>
-  <p class="tag">मासिक अंक</p>
+        extra.append('<a href="authors/">लेखकांनुसार सगळे लेख →</a>')
+    if os.path.isdir(os.path.join(DOCS, 'guide')):
+        extra.append('<a href="guide/">संपादकांसाठी</a>')
+    more = f'<div class="more-row">{"".join(extra)}</div>' if extra else ''
+
+    inner = f"""<main>
+  <div class="top"><h1>पालकनीती</h1><p class="tag">मासिक अंक</p></div>
   {body}
-  <footer><p>सर्व लेख <a href="https://palakneeti.in">palakneeti.in</a> वर प्रसिद्ध झाले आहेत.</p>
-  <p style="margin-top:.6rem"><a href="guide/">संपादकांसाठी : नवा अंक कसा तयार करायचा</a></p></footer>
-</main></body></html>
-'''
+  {more}
+  <footer><p>सर्व लेख <a href="https://palakneeti.in" target="_blank"
+    rel="noopener">palakneeti.in</a> वर प्रसिद्ध झाले आहेत.</p></footer>
+</main>"""
+    return chrome.page('पालकनीती मासिक', INDEX_CSS, inner,
+                       home='./', label='मासिक अंक', progress=False)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@
 """Build the mobile reading edition of one issue as a single self-contained
    HTML page.   usage: web.py <issue-key>"""
 import base64, html, io, json, os, re, sys
+import chrome
 from PIL import Image
 from issues import resolve, MASTHEAD, SITE
 
@@ -189,75 +190,7 @@ def article_html(a, n, total):
 
 
 CSS = """
-:root{
-  --paper:#F6F8F4; --surface:#EDF1EA; --raise:#FFFFFF;
-  --ink:#16211D; --soft:#56685F; --faint:#7C8C84;
-  --moss:#1F5A4C; --clay:#BC5D2C; --rule:#DBE3DA;
-  --measure:34rem; --tscale:1; --linework:none;
-  --serif:'Tiro Devanagari Marathi','Noto Serif Devanagari',Georgia,serif;
-  --sans:'Mukta','Noto Sans Devanagari',system-ui,-apple-system,sans-serif;
-}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --paper:#101613; --surface:#18211D; --raise:#1D2823;
-    --ink:#E6EBE4; --soft:#9DACA3; --faint:#7E8D85;
-    --moss:#7CC4AB; --clay:#E4885C; --rule:#25322C;
-    --linework:invert(1);
-  }
-}
-:root[data-theme="dark"]{
-  --paper:#101613; --surface:#18211D; --raise:#1D2823;
-  --ink:#E6EBE4; --soft:#9DACA3; --faint:#7E8D85;
-  --moss:#7CC4AB; --clay:#E4885C; --rule:#25322C;
-  --linework:invert(1);
-}
-
-*{box-sizing:border-box;}
-body{
-  margin:0; background:var(--paper); color:var(--ink);
-  font-family:var(--sans);
-  font-size:calc(17px * var(--tscale));
-  line-height:1.78; -webkit-text-size-adjust:100%;
-}
-img{max-width:100%; display:block;}
-a{color:var(--moss);}
-:focus-visible{outline:2px solid var(--clay); outline-offset:3px; border-radius:2px;}
-
-/* ── chrome ───────────────────────────────────────────────────── */
-.progress{position:fixed; inset:0 auto auto 0; height:2px; width:0;
-  background:var(--clay); z-index:60;}
-.bar{position:sticky; top:0; z-index:50; background:var(--paper);
-  border-bottom:1px solid var(--rule);
-  display:flex; align-items:center; gap:.7rem;
-  padding:.55rem max(1.15rem, env(safe-area-inset-left)) .55rem 1.15rem;}
-.bar .tree{width:26px; height:26px; object-fit:contain; flex:none;
-  filter:var(--linework);}
-.bar .who{font-family:var(--serif); font-size:1.02rem; line-height:1.1;
-  color:var(--moss); letter-spacing:.01em;}
-.bar .mo{font-size:.74rem; color:var(--faint); line-height:1.1; margin-top:.1rem;}
-.bar .spacer{flex:1;}
-.thm{background:transparent; border:1px solid var(--rule); border-radius:999px;
-  width:2rem; height:2rem; padding:0; cursor:pointer; color:var(--soft);
-  display:grid; place-items:center; flex:none; margin-right:.15rem;}
-.thm svg{width:15px; height:15px; display:none;}
-.thm[data-m="auto"] .i-auto,
-.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block;}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss); border-color:var(--moss);}
-.tsize{display:flex; gap:.28rem;}
-.tsize button{
-  font-family:var(--sans); background:transparent; color:var(--soft);
-  border:1px solid var(--rule); border-radius:999px; cursor:pointer;
-  width:2rem; height:2rem; line-height:1; padding:0;
-  display:grid; place-items:center;}
-.tsize button[aria-pressed="true"]{
-  background:var(--moss); border-color:var(--moss); color:var(--paper);}
-.tsize button:nth-child(1){font-size:.78rem;}
-.tsize button:nth-child(2){font-size:.95rem;}
-.tsize button:nth-child(3){font-size:1.12rem;}
-
-main{max-width:var(--measure); margin:0 auto; padding:0 1.15rem 4rem;}
-
+/* the page furniture — palette, bar, controls — lives in chrome.py */
 /* ── masthead ─────────────────────────────────────────────────── */
 .top{padding:3rem 0 2.2rem; text-align:center;}
 .top h1{font-family:var(--serif); font-weight:400;
@@ -375,62 +308,19 @@ main{max-width:var(--measure); margin:0 auto; padding:0 1.15rem 4rem;}
   transform:translateY(8px); transition:opacity .2s, transform .2s;}
 .fab.on{opacity:1; pointer-events:auto; transform:none;}
 
-@media (prefers-reduced-motion:reduce){
-  *{scroll-behavior:auto!important; transition:none!important;}
-}
-@media print{
-  .bar,.fab,.progress,.art-foot,.divider{display:none;}
-  body{background:#fff; color:#000;}
-  .art{page-break-before:always;}
-}
 """
 
 JS = """
 (function(){
-  var root=document.documentElement, bar=document.querySelector('.progress');
-  function prog(){
-    var h=document.body.scrollHeight-innerHeight;
-    bar.style.width=(h>0?(scrollY/h)*100:0)+'%';
-  }
-  addEventListener('scroll',prog,{passive:true}); prog();
-
   var fab=document.querySelector('.fab'), toc=document.getElementById('contents');
+  if(!fab||!toc) return;
   addEventListener('scroll',function(){
     fab.classList.toggle('on', scrollY > toc.offsetTop + toc.offsetHeight + 200);
   },{passive:true});
-
-  var steps=[0.92,1,1.14], btns=[].slice.call(document.querySelectorAll('.tsize button'));
-  function apply(i){
-    root.style.setProperty('--tscale',steps[i]);
-    btns.forEach(function(b,j){b.setAttribute('aria-pressed',j===i);});
-    try{localStorage.setItem('pn-tsize',i);}catch(e){}
-  }
-  btns.forEach(function(b,i){b.addEventListener('click',function(){apply(i);});});
-
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'), mi=0;
-  function theme(i){
-    var m=modes[i]; mi=i;
-    if(m==='auto'){
-      if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme');
-    } else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);
-    tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}
-  }
-  tb.addEventListener('click',function(){theme((mi+1)%3);});
-  var tm=0; try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-  theme(tm);
-
   var calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.getElementById('tocBtn').addEventListener('click',function(){
     toc.scrollIntoView(calm?true:{behavior:'smooth'});
   });
-  var saved=1; try{var v=localStorage.getItem('pn-tsize'); if(v!==null)saved=+v;}catch(e){}
-  apply(saved);
 })();
 """
 
@@ -454,52 +344,7 @@ def build():
 
     body = '\n'.join(article_html(a, i, n) for i, a in enumerate(arts, 1))
 
-    return f'''<title>पालकनीती · {CFG['month_mr']}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700&family=Tiro+Devanagari+Marathi&display=swap">
-<style>{CSS}</style>
-<script>
-/* stamp the saved theme before first paint, so the page never flashes the
-   other theme on load. The host may have stamped data-theme itself; remember
-   it, because "auto" means defer to the host, not force the OS setting. */
-(function(){{
-  var r=document.documentElement;
-  r.__hostTheme=r.getAttribute('data-theme');
-  try{{
-    var m=localStorage.getItem('pn-theme');
-    if(m==='light'||m==='dark') r.setAttribute('data-theme',m);
-  }}catch(e){{}}
-}})();
-</script>
-
-<div class="progress" aria-hidden="true"></div>
-
-<header class="bar">
-  <img class="tree" src="{MARK_TREE}" alt="">
-  <div>
-    <div class="who">पालकनीती</div>
-    <div class="mo">{esc(CFG['month_mr'])}</div>
-  </div>
-  <div class="spacer"></div>
-  <button class="thm" type="button" id="thmBtn" data-m="auto" aria-label="थीम">
-    <svg class="i-auto" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.1"
-      fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 1.9a6.1 6.1 0 0 0 0 12.2z"
-      fill="currentColor"/></svg>
-    <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.1"
-      fill="currentColor"/><g stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path
-      d="M8 1V2.4M8 13.6V15M15 8h-1.4M2.4 8H1M12.9 3.1l-1 1M4.1 11.9l-1 1M12.9 12.9l-1-1M4.1 4.1l-1-1"/></g></svg>
-    <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path
-      d="M13.4 9.7A5.8 5.8 0 0 1 6.3 2.6a5.9 5.9 0 1 0 7.1 7.1z" fill="currentColor"/></svg>
-  </button>
-  <div class="tsize" role="group" aria-label="अक्षरांचा आकार">
-    <button type="button" aria-pressed="false" aria-label="लहान अक्षरं">अ</button>
-    <button type="button" aria-pressed="true" aria-label="नेहमीचा आकार">अ</button>
-    <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
-  </div>
-</header>
-
-<main>
+    body = f"""<main>
   <div class="top">
     <h1>पालकनीती</h1>
     <p class="issue">{esc(CFG['month_mr'])}</p>
@@ -520,13 +365,13 @@ def build():
     <p>सर्व लेख <a href="https://palakneeti.in" target="_blank" rel="noopener">palakneeti.in</a>
        वर प्रसिद्ध झाले आहेत. जुने अंक आणि लेख तिथे वाचता येतील.</p>
     <a class="site" href="https://palakneeti.in" target="_blank" rel="noopener">{SITE}</a>
+    <p><a class="backlink" href="../">← सगळे अंक</a></p>
   </footer>
 </main>
-
 <button class="fab" type="button" id="tocBtn">अनुक्रम</button>
-
-<script>{JS}</script>
-'''
+<script>{JS}</script>"""
+    return chrome.page(f"पालकनीती · {CFG['month_mr']}", CSS, body,
+                       home='../', label=CFG['month_mr'])
 
 
 out = os.path.join(B, f'web-{KEY}.html')
