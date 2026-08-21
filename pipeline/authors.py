@@ -11,6 +11,7 @@ author has to be read out of the article itself.
 import hashlib, html as H, json, os, re, sys, datetime
 import fetchparse as fp
 import chrome
+from issues import is_month_index
 
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else '..')
 # accepts a year ("2026") or a month key ("2026-08"), so the workflow can
@@ -96,12 +97,21 @@ def avatar(url, cache={}):
        site does not actually have the file (older posts 404)."""
     if not url:
         return ''
-    if url in cache:
-        return cache[url]
+    key = url
+    if key in cache:
+        return cache[key]
     out = ''
     try:
-        import io, base64, urllib.request
+        import io, base64, urllib.request, urllib.parse
         from PIL import Image
+        # Author photos are uploaded under their Marathi names, so the path
+        # holds Devanagari and urlopen raises UnicodeEncodeError on it before
+        # any request goes out — which the except below then swallowed as
+        # "no photo". fetchparse.fetch_image has always quoted; this did not.
+        _p = urllib.parse.urlsplit(url)
+        url = urllib.parse.urlunsplit((_p.scheme, _p.netloc,
+                                       urllib.parse.quote(_p.path, safe='/%'),
+                                       _p.query, ''))
         req = urllib.request.Request(url, headers=fp.HEADERS)
         with urllib.request.urlopen(req, timeout=30) as r:
             im = Image.open(io.BytesIO(r.read()))
@@ -115,7 +125,7 @@ def avatar(url, cache={}):
         out = 'data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode()
     except Exception:
         out = ''
-    cache[url] = out
+    cache[key] = out
     return out
 
 
@@ -130,6 +140,8 @@ def analyse(posts):
     parsed = []
     for p in posts:
         title = clean(H.unescape(re.sub('<[^>]+>', '', p['title']['rendered'])))
+        if is_month_index(title):
+            continue          # a list of links, not a piece of writing
         blocks = fp.to_blocks(p['content']['rendered'])
         a = fp.normalize(title, p['slug'], blocks, p)
         tail_txt = [fp.plain(b['runs']) for b in blocks[-6:]
@@ -349,8 +361,9 @@ def build():
         f'<span class="n">{dev(len(p["items"]))} लेख</span></div>'
         for p in ranked)
     attributed = sum(1 for _, f in articles if f)
+    # articles, not posts: the month index posts are not writing
     body = (f'<h1>लेखक</h1><p class="tag">{span} · {dev(len(ranked))} लेखक · '
-            f'{dev(len(posts))} लेख</p>{rows}')
+            f'{dev(len(articles))} लेख</p>{rows}')
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(
         shell('लेखक — पालकनीती', body, '../', 'लेखक'))
 
@@ -359,8 +372,9 @@ def build():
                            'img': p['img'], 'span': span} for p in ranked},
               open(os.path.join(OUT, 'map.json'), 'w'), ensure_ascii=False)
 
-    print(f'  {len(posts)} articles {span}; {attributed} attributed, '
-          f'{len(posts) - attributed} without a named author')
+    print(f'  {len(articles)} articles {span} ({len(posts)} posts, '
+          f'{len(posts) - len(articles)} month index); {attributed} attributed, '
+          f'{len(articles) - attributed} without a named author')
     print(f'  {len(ranked)} contributors')
     for p in ranked[:8]:
         print(f'    {len(p["items"]):3}  {p["name"]}  → authors/{p["slug"]}/')

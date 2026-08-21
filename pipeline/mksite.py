@@ -24,6 +24,19 @@ def record():
     os.makedirs(dest, exist_ok=True)
     arts = json.load(open(os.path.join(PIPE, 'data', cfg.get('data', KEY),
                                        'issue.json')))
+    # up to मे २०२६ the issue PDF was made by hand and put on Drive; the
+    # month index post carried the link, and fetchparse kept it
+    pdf_url = None
+    mp = os.path.join(PIPE, 'data', cfg.get('data', KEY), 'issue-meta.json')
+    if os.path.exists(mp):
+        pdf_url = json.load(open(mp)).get('pdf_url')
+    # a rebuild must not drop a link recorded by an earlier one
+    old = os.path.join(dest, 'meta.json')
+    if not pdf_url and os.path.exists(old):
+        try:
+            pdf_url = json.load(open(old)).get('pdf_url')
+        except Exception:
+            pass
     meta = {
         'key': KEY,
         'month_mr': cfg['month_mr'],
@@ -33,6 +46,7 @@ def record():
         'built': datetime.date.today().isoformat(),
         'pdf': f'{cfg["out"]}.pdf' if os.path.exists(
             os.path.join(dest, f'{cfg["out"]}.pdf')) else None,
+        'pdf_url': pdf_url,
     }
     json.dump(meta, open(os.path.join(dest, 'meta.json'), 'w'),
               ensure_ascii=False, indent=1)
@@ -83,8 +97,14 @@ footer a{color:var(--moss)}
 def index(issues):
     rows = []
     for m in issues:
-        pdf = (f'<a class="pdf" href="{esc(m["key"])}/{esc(m["pdf"])}">PDF</a>'
-               if m.get('pdf') else '')
+        # the hand-made edition on Drive wins over anything generated
+        if m.get('pdf_url'):
+            pdf = (f'<a class="pdf" href="{esc(m["pdf_url"])}" target="_blank"'
+                   f' rel="noopener">PDF</a>')
+        elif m.get('pdf'):
+            pdf = f'<a class="pdf" href="{esc(m["key"])}/{esc(m["pdf"])}">PDF</a>'
+        else:
+            pdf = ''
         titles = ''.join(f'<li>{esc(t)}</li>' for t in m.get('titles', [])[:8])
         rows.append(f"""<section class="issue">
   <h2>{esc(m['month_mr'])}</h2>
