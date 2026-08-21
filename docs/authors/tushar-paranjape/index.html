@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>तुषार जयवंत परांजपे</h1><p class="tag">१ लेख · २०२५–२०२६</p><div class="bio">हिन्दी-मराठी सिनेसृष्टीत स्क्रीनरायटर म्हणून कार्यरत. सिनेमा-स्क्रीनरायटिंग ह्या विषयाचे शिक्षक, तसेच बौद्ध तत्वज्ञानाचे विद्यार्थी. (लेखातील चित्रे इंटरनेटवरून साभार) (लेखात व्यक्त केलेली मते लेखकाची स्वतःची असून संपादक मंडळ त्यांच्याशी सहमत असेलच असे नाही.)<p style="margin:.5rem 0 0"><a href="mailto:tushar.paranjape@gmail.com">tushar.paranjape@gmail.com</a></p></div><p class="yr">२०२६</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>तुषार जयवंत परांजपे</h1><p class="tag">१ लेख · २०२५–२०२६</p></div></div><div class="bio">हिन्दी-मराठी सिनेसृष्टीत स्क्रीनरायटर म्हणून कार्यरत. सिनेमा-स्क्रीनरायटिंग ह्या विषयाचे शिक्षक, तसेच बौद्ध तत्वज्ञानाचे विद्यार्थी. (लेखातील चित्रे इंटरनेटवरून साभार) (लेखात व्यक्त केलेली मते लेखकाची स्वतःची असून संपादक मंडळ त्यांच्याशी सहमत असेलच असे नाही.)<p style="margin:.5rem 0 0"><a href="mailto:tushar.paranjape@gmail.com">tushar.paranjape@gmail.com</a></p></div><p class="yr">२०२६</p><ol class="arts">
 <li><a href="https://palakneeti.in/entitled-disrespectful-distracted/" target="_blank" rel="noopener">एन्टायटल्ड – डिस्-रिस्पेक्टफुल – डिस्ट्रॅक्टेड (Entitled – Disrespectful – Distracted) की अवेअर – अ‍ॅसर्टिव्ह – एंगेज्ड (Aware – Assertive- Engaged)<span class="out">↗</span></a><div class="meta">ऑगस्ट</div></li>
 </ol><footer><p>लेख <a href="https://palakneeti.in" target="_blank" rel="noopener">palakneeti.in</a> वर उघडतील. ही यादी त्या संकेतस्थळावरून आपोआप तयार होते.</p><p><a class="backlink" href="../../">← सगळे अंक</a></p></footer></main>
 
@@ -150,19 +161,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);

@@ -88,6 +88,37 @@ def fetch_year(year):                      # kept for one-year callers
     return fetch_years(year, year)
 
 
+AVATAR_PX = 96          # rendered at 40-48 css px, so 2x is plenty
+
+
+def avatar(url, cache={}):
+    """A small square JPEG data URI for the author's photo, or '' if the
+       site does not actually have the file (older posts 404)."""
+    if not url:
+        return ''
+    if url in cache:
+        return cache[url]
+    out = ''
+    try:
+        import io, base64, urllib.request
+        from PIL import Image
+        req = urllib.request.Request(url, headers=fp.HEADERS)
+        with urllib.request.urlopen(req, timeout=30) as r:
+            im = Image.open(io.BytesIO(r.read()))
+        im = im.convert('RGB')
+        side = min(im.size)
+        l, t = (im.width - side) // 2, (im.height - side) // 2
+        im = im.crop((l, t, l + side, t + side)).resize(
+            (AVATAR_PX, AVATAR_PX), Image.LANCZOS)
+        buf = io.BytesIO()
+        im.save(buf, 'JPEG', quality=78, optimize=True)
+        out = 'data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode()
+    except Exception:
+        out = ''
+    cache[url] = out
+    return out
+
+
 def analyse(posts):
     """Pull the contributors out of each article.
 
@@ -118,7 +149,7 @@ def analyse(posts):
 
     people, articles = {}, []
 
-    def add(name, email, role, art, bio=None):
+    def add(name, email, role, art, bio=None, photo=None):
         name = clean(name)
         if not name:
             return
@@ -129,7 +160,9 @@ def analyse(posts):
             key = known[k].lower()
             email = known[k]
         p = people.setdefault(key, {'name': name, 'email': email or '',
-                                    'bio': '', 'items': []})
+                                    'bio': '', 'photo': '', 'items': []})
+        if photo and not p['photo']:
+            p['photo'] = photo
         if email and not p['email']:
             p['email'] = email
         if bio and not p['bio']:
@@ -152,7 +185,8 @@ def analyse(posts):
 
         if a['tail'] and a['tail']['name']:
             add(a['tail']['name'], a['tail']['email'],
-                a['tail'].get('role') or 'लेखन', art, a['tail'].get('bio'))
+                a['tail'].get('role') or 'लेखन', art, a['tail'].get('bio'),
+                a['tail'].get('photo_src'))
             found += 1
 
         for b in a['byline']:
@@ -172,9 +206,9 @@ def analyse(posts):
             # mistaken for people
             # the name may sit in a heading of any level, which the layout
             # parser treats as a section label rather than a byline
+            texts = [b for b in blocks if b['type'] in ('head', 'para')][:3]
             heads = [clean(a['kicker'])] + [
-                clean(fp.plain(b.get('runs', []))) for b in blocks[:3]
-                if b['type'] in ('head', 'para')]
+                clean(fp.plain(b.get('runs', []))) for b in texts]
             for k in heads:
                 if k and key_of(k) in known:
                     add(k, known[key_of(k)], 'लेखन', art)
@@ -207,14 +241,26 @@ PAGE_CSS = """
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -265,13 +311,22 @@ def article_list(items):
     return '\n'.join(out)
 
 
+def av_html(p, cls='av'):
+    if p.get('img'):
+        return f'<img class="{cls}" src="{p["img"]}" alt="" loading="lazy">'
+    return f'<span class="{cls} none">{esc(p["name"][:1])}</span>'
+
+
 def build():
     posts = fetch_years(FIRST_YEAR, YEAR)
     people, articles = analyse(posts)
     os.makedirs(OUT, exist_ok=True)
     span = (f'{dev(FIRST_YEAR)}–{dev(YEAR)}' if YEAR > FIRST_YEAR else dev(YEAR))
 
+    for p in people.values():
+        p['img'] = avatar(p.get('photo'))
     ranked = sorted(people.values(), key=lambda p: (-len(p['items']), p['name']))
+    print(f'  {sum(1 for p in ranked if p["img"])}/{len(ranked)} have a usable photo')
 
     for p in ranked:
         d = os.path.join(OUT, p['slug'])
@@ -281,14 +336,16 @@ def build():
             mail = (f'<p style="margin:.5rem 0 0"><a href="mailto:{esc(p["email"])}">'
                     f'{esc(p["email"])}</a></p>' if p['email'] else '')
             bio = f'<div class="bio">{esc(p["bio"])}{mail}</div>'
-        body = (f'<h1>{esc(p["name"])}</h1>'
+        body = (f'<div class="hero">{av_html(p)}<div>'
+                f'<h1>{esc(p["name"])}</h1>'
                 f'<p class="tag">{dev(len(p["items"]))} लेख · {span}</p>'
-                f'{bio}{article_list(p["items"])}')
+                f'</div></div>{bio}{article_list(p["items"])}')
         open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(
             shell(f'{p["name"]} — पालकनीती', body, '../../', p['name']))
 
     rows = ''.join(
-        f'<div class="who"><a href="{p["slug"]}/">{esc(p["name"])}</a>'
+        f'<div class="who">{av_html(p)}<span class="nm">'
+        f'<a href="{p["slug"]}/">{esc(p["name"])}</a></span>'
         f'<span class="n">{dev(len(p["items"]))} लेख</span></div>'
         for p in ranked)
     attributed = sum(1 for _, f in articles if f)
@@ -297,7 +354,9 @@ def build():
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(
         shell('लेखक — पालकनीती', body, '../', 'लेखक'))
 
-    json.dump({p['name']: p['slug'] for p in ranked},
+    # web.py reads this to show the same face and count beside every byline
+    json.dump({p['name']: {'slug': p['slug'], 'n': len(p['items']),
+                           'img': p['img'], 'span': span} for p in ranked},
               open(os.path.join(OUT, 'map.json'), 'w'), ensure_ascii=False)
 
     print(f'  {len(posts)} articles {span}; {attributed} attributed, '

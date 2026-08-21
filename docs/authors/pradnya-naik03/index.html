@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>प्रज्ञा मंदार नाईक</h1><p class="tag">१ लेख · २०२५–२०२६</p><div class="bio">गेली वीस वर्षे जपानमध्ये वास्तव्य. जपानी भाषेच्या अनुवादक आणि दुभाषी म्हणून कार्यरत.<p style="margin:.5rem 0 0"><a href="mailto:pradnya.naik03@gmail.com">pradnya.naik03@gmail.com</a></p></div><p class="yr">२०२५</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>प्रज्ञा मंदार नाईक</h1><p class="tag">१ लेख · २०२५–२०२६</p></div></div><div class="bio">गेली वीस वर्षे जपानमध्ये वास्तव्य. जपानी भाषेच्या अनुवादक आणि दुभाषी म्हणून कार्यरत.<p style="margin:.5rem 0 0"><a href="mailto:pradnya.naik03@gmail.com">pradnya.naik03@gmail.com</a></p></div><p class="yr">२०२५</p><ol class="arts">
 <li><a href="https://palakneeti.in/%e0%a4%9a%e0%a5%80-%e0%a4%a4%e0%a5%8b%e0%a4%95%e0%a5%82-%e0%a4%a4%e0%a4%be%e0%a4%88/" target="_blank" rel="noopener">ची-तोकू-ताई<span class="out">↗</span></a><div class="meta">एप्रिल</div></li>
 </ol><footer><p>लेख <a href="https://palakneeti.in" target="_blank" rel="noopener">palakneeti.in</a> वर उघडतील. ही यादी त्या संकेतस्थळावरून आपोआप तयार होते.</p><p><a class="backlink" href="../../">← सगळे अंक</a></p></footer></main>
 
@@ -150,19 +161,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);

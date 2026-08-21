@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>शिल्पा कुलकर्णी</h1><p class="tag">१ लेख · २०२५–२०२६</p><div class="bio">महाराष्ट्र शासनाच्या शालेय शिक्षण व क्रीडा विभाग, जिल्हा शिक्षण व प्रशिक्षण संस्था, रायगड येथे ग्रंथपाल. विविध नियतकालिकांत प्रामुख्याने पर्यावरण विषयावर लेखन.<p style="margin:.5rem 0 0"><a href="mailto:ranu273@gmail.com">ranu273@gmail.com</a></p></div><p class="yr">२०२६</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>शिल्पा कुलकर्णी</h1><p class="tag">१ लेख · २०२५–२०२६</p></div></div><div class="bio">महाराष्ट्र शासनाच्या शालेय शिक्षण व क्रीडा विभाग, जिल्हा शिक्षण व प्रशिक्षण संस्था, रायगड येथे ग्रंथपाल. विविध नियतकालिकांत प्रामुख्याने पर्यावरण विषयावर लेखन.<p style="margin:.5rem 0 0"><a href="mailto:ranu273@gmail.com">ranu273@gmail.com</a></p></div><p class="yr">२०२६</p><ol class="arts">
 <li><a href="https://palakneeti.in/nawadta-navhe-avadta/" target="_blank" rel="noopener">नावडता??? नव्हे… आवडता!!!<span class="out">↗</span></a><div class="meta">जुलै</div></li>
 </ol><footer><p>लेख <a href="https://palakneeti.in" target="_blank" rel="noopener">palakneeti.in</a> वर उघडतील. ही यादी त्या संकेतस्थळावरून आपोआप तयार होते.</p><p><a class="backlink" href="../../">← सगळे अंक</a></p></footer></main>
 
@@ -150,19 +161,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);

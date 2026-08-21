@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>उत्तरा जाधव</h1><p class="tag">२ लेख · २०२५–२०२६</p><div class="bio">गेली ४५ वर्षे प्रकाशन, आयटी आणि आंतरराष्ट्रीय शिक्षण ह्या क्षेत्रात कार्यरत. सध्या ‘वंचित विकास’ ह्या संस्थेसाठी व्यवस्थापन सल्लागार म्हणून काम करतात. आपले जग चांगले बनवण्यासाठी काम करण्यावर त्यांचा दृढ विश्वास आहे.<p style="margin:.5rem 0 0"><a href="mailto:uttaraad@gmail.com">uttaraad@gmail.com</a></p></div><p class="yr">२०२६</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>उत्तरा जाधव</h1><p class="tag">२ लेख · २०२५–२०२६</p></div></div><div class="bio">गेली ४५ वर्षे प्रकाशन, आयटी आणि आंतरराष्ट्रीय शिक्षण ह्या क्षेत्रात कार्यरत. सध्या ‘वंचित विकास’ ह्या संस्थेसाठी व्यवस्थापन सल्लागार म्हणून काम करतात. आपले जग चांगले बनवण्यासाठी काम करण्यावर त्यांचा दृढ विश्वास आहे.<p style="margin:.5rem 0 0"><a href="mailto:uttaraad@gmail.com">uttaraad@gmail.com</a></p></div><p class="yr">२०२६</p><ol class="arts">
 <li><a href="https://palakneeti.in/artha-ani-anartha/" target="_blank" rel="noopener">अर्थ आणि अनर्थ<span class="out">↗</span></a><div class="meta">एप्रिल</div></li>
 <li><a href="https://palakneeti.in/indradhanushyachee-vaat/" target="_blank" rel="noopener">इंद्रधनुष्याची वाट<span class="out">↗</span></a><div class="meta">फेब्रुवारी</div></li>
 </ol><footer><p>लेख <a href="https://palakneeti.in" target="_blank" rel="noopener">palakneeti.in</a> वर उघडतील. ही यादी त्या संकेतस्थळावरून आपोआप तयार होते.</p><p><a class="backlink" href="../../">← सगळे अंक</a></p></footer></main>
@@ -151,19 +162,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);

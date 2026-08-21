@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>रुबी रमा प्रवीण</h1><p class="tag">१० लेख · २०२५–२०२६</p><div class="bio">पालकनीती संपादकगटाच्या सदस्य.<p style="margin:.5rem 0 0"><a href="mailto:ruby.rp@gmail.com">ruby.rp@gmail.com</a></p></div><p class="yr">२०२५</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>रुबी रमा प्रवीण</h1><p class="tag">१० लेख · २०२५–२०२६</p></div></div><div class="bio">पालकनीती संपादकगटाच्या सदस्य.<p style="margin:.5rem 0 0"><a href="mailto:ruby.rp@gmail.com">ruby.rp@gmail.com</a></p></div><p class="yr">२०२५</p><ol class="arts">
 <li><a href="https://palakneeti.in/%e0%a4%86%e0%a4%aa%e0%a4%be%e0%a4%aa%e0%a4%b2%e0%a4%82-%e0%a4%85%e0%a4%b8%e0%a4%a3%e0%a4%82/" target="_blank" rel="noopener">आपापलं असणं<span class="out">↗</span></a><div class="meta">डिसेंबर</div></li>
 <li><a href="https://palakneeti.in/%e0%a4%ac%e0%a5%87%e0%a4%95%e0%a5%80-%e0%a4%95%e0%a5%80-%e0%a4%ac%e0%a4%be%e0%a4%a4/" target="_blank" rel="noopener">बेकी की बात<span class="out">↗</span></a><div class="meta">डिसेंबर</div></li>
 <li><a href="https://palakneeti.in/%e0%a4%86%e0%a4%88-%e0%a4%b0%e0%a4%a1%e0%a4%a4%e0%a5%87%e0%a4%af/" target="_blank" rel="noopener">“आई रडतेय!”<span class="out">↗</span></a><div class="meta">सप्टेंबर</div></li>
@@ -159,19 +170,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);

@@ -23,13 +23,29 @@ except Exception:
     AUTHORS = {}
 _akey = lambda n: re.sub(r'\s+', '', n or '').lower()
 AUTHOR_BY_KEY = {_akey(k): v for k, v in AUTHORS.items()}
+
+
+def author_rec(name):
+    m = ROLE_SPLIT.match((name or '').strip())
+    person = m.group(2) if m else (name or '')
+    rec = AUTHOR_BY_KEY.get(_akey(person.strip(' .,')))
+    return rec if isinstance(rec, dict) else None
+
+
+def avatar_html(name, cls='av'):
+    """The author's face, or their initial when the site has no photo."""
+    rec = author_rec(name)
+    if rec and rec.get('img'):
+        return f'<img class="{cls}" src="{rec["img"]}" alt="" loading="lazy">'
+    m = ROLE_SPLIT.match((name or '').strip())
+    person = (m.group(2) if m else (name or '')).strip(' .,')
+    return f'<span class="{cls} none">{esc(person[:1])}</span>' if person else ''
 ROLE_SPLIT = re.compile(r'^(अनुवाद|शब्दांकन|छायाचित्र[े]?|संकलन)\s*[:：]\s*(.+)$')
 
 
 def author_slug(name):
-    m = ROLE_SPLIT.match((name or '').strip())
-    person = m.group(2) if m else (name or '')
-    return AUTHOR_BY_KEY.get(_akey(person.strip(' .,')))
+    rec = author_rec(name)
+    return rec and rec.get('slug')
 
 
 def author_html(name):
@@ -37,7 +53,8 @@ def author_html(name):
        the link so only the person's name is clickable."""
     m = ROLE_SPLIT.match(name.strip())
     prefix, person = (m.group(1) + ' : ', m.group(2)) if m else ('', name)
-    slug = AUTHOR_BY_KEY.get(_akey(person.strip(' .,')))
+    rec = author_rec(name)
+    slug = rec and rec.get('slug')
     if not slug:
         return esc(name)
     return (f'{esc(prefix)}<a class="who-link" href="../authors/{slug}/">'
@@ -116,6 +133,8 @@ def block_html(b):
     if t == 'head':
         return f'<h3>{runs_html(b["runs"])}</h3>'
     if t == 'image':
+        if not b.get('file'):        # nothing was downloaded for this one
+            return ''
         src = data_uri(os.path.join(IMGDIR, b['file']), 1100)
         cap = (f'<figcaption>{esc(b["caption"])}</figcaption>'
                if b.get('caption') else '')
@@ -140,7 +159,8 @@ def article_html(a, n, total):
     p.append(f'<h2>{esc(a["title"])}</h2>')
     if a['byline']:
         names = ' · '.join(author_html(x) for x in a['byline'])
-        p.append(f'<p class="byline"><img class="nib" src="{MARK_PEN}" alt="">'
+        face = avatar_html(a['byline'][0], 'av md')
+        p.append(f'<p class="byline">{face or f"<img class=\"nib\" src=\"{MARK_PEN}\" alt=\"\">"}'
                  f'<span>{names}</span></p>')
     p.append(f'<p class="rtime">{dev(read_minutes(a))} मिनिटं वाचन</p>')
     p.append('</header>')
@@ -170,11 +190,16 @@ def article_html(a, n, total):
         bio = f'<p>{esc(tl["bio"])}</p>' if tl['bio'] else ''
         mail = (f'<a class="mail" href="mailto:{esc(tl["email"])}">'
                 f'{esc(tl["email"])}</a>')
-        slug = author_slug(tl['name'])
+        rec = author_rec(tl['name'])
+        slug = rec and rec.get('slug')
+        cnt = ''
+        if rec and rec.get('n'):
+            cnt = (f'<p class="count">{rec["span"]} मध्ये '
+                   f'{dev(rec["n"])} लेख</p>')
         more = (f'<a class="more" href="../authors/{slug}/">'
                 f'या लेखकाचे सगळे लेख →</a>') if slug else ''
         p.append(f'''<aside class="author">{photo}
-    <div><h4>{author_html(tl['name'])}{role}</h4>{mail}{bio}{more}</div></aside>''')
+    <div><h4>{author_html(tl['name'])}{role}</h4>{mail}{bio}{cnt}{more}</div></aside>''')
     if a['credit']:
         p.append(f'<p class="credit">{esc(a["credit"])}</p>')
 
@@ -190,6 +215,14 @@ def article_html(a, n, total):
 
 
 CSS = """
+.av{border-radius:50%;object-fit:cover;flex:none;background:var(--surface)}
+.av.none{display:inline-grid;place-items:center;font-family:var(--serif);
+  color:var(--faint);line-height:1}
+.av.sm{width:1.3rem;height:1.3rem;font-size:.72rem;
+  display:inline-block;vertical-align:-.3rem;margin-right:.4rem}
+span.av.sm.none{display:inline-grid;vertical-align:-.3rem}
+.av.md{width:1.7rem;height:1.7rem;font-size:.9rem}
+.author .count{margin:.55rem 0 0;font-size:.85rem;color:var(--faint)}
 /* the page furniture — palette, bar, controls — lives in chrome.py */
 /* ── masthead ─────────────────────────────────────────────────── */
 .top{padding:3rem 0 2.2rem; text-align:center;}
@@ -332,10 +365,11 @@ def build():
     toc = []
     for i, a in enumerate(arts, 1):
         who = ' · '.join(esc(x) for x in a['byline'])
+        face = avatar_html(a['byline'][0], 'av sm') if a['byline'] else ''
         toc.append(f'''<li><a href="#a{i}">
       <span class="n">{dev(i)}</span>
       <span><span class="t">{esc(a['title'])}</span>
-        <span class="m">{who}{' &nbsp;·&nbsp; ' if who else ''}'''
+        <span class="m">{face}{who}{' &nbsp;·&nbsp; ' if who else ''}'''
                    f'''<b>{dev(read_minutes(a))} मिनिटं</b></span></span>
     </a></li>''')
 

@@ -119,8 +119,9 @@ def to_blocks(html_src):
                 continue
             fn = fetch_image(img.get('src', ''))
             cap = el.find('figcaption')
-            if fn:
+            if fn or img.get('src'):
                 blocks.append({'type': 'image', 'file': fn,
+                               'src': img.get('src', ''),
                                'w': img.get('width'), 'h': img.get('height'),
                                'caption': cap.get_text(' ', strip=True) if cap else ''})
         elif el.name == 'blockquote':
@@ -160,14 +161,22 @@ def normalize(title, slug, blocks, post):
     body_end = n
 
     if email_i is not None:
+        # the author photo usually sits just above the email, but some
+        # articles put it just below — look both ways
         photo_i = next((j for j in range(email_i - 1, max(email_i - 4, -1), -1)
                         if b[j]['type'] == 'image'), None)
-        start = photo_i if photo_i is not None else email_i
+        if photo_i is None:
+            photo_i = next((j for j in range(email_i + 1, min(email_i + 4, n))
+                            if b[j]['type'] == 'image'), None)
+        start = photo_i if (photo_i is not None and photo_i < email_i) else email_i
         name_i = next((j for j in range(start - 1, max(start - 3, -1), -1)
                        if b[j]['type'] == 'para' and len(plain(b[j]['runs'])) < 60), None)
 
         bio, k = [], email_i + 1
-        while k < n and b[k]['type'] in ('para', 'head'):
+        while k < n and (b[k]['type'] in ('para', 'head') or k == photo_i):
+            if k == photo_i:          # the author photo, already accounted for
+                k += 1
+                continue
             t = plain(b[k]['runs'])
             if t.startswith('सौजन्य') or t.startswith('संदर्भ'):
                 break
@@ -185,21 +194,30 @@ def normalize(title, slug, blocks, post):
 
         tail = {'role': role, 'name': raw_name, 'email': plain(b[email_i]['runs']),
                 'photo': b[photo_i]['file'] if photo_i is not None else None,
+                'photo_src': b[photo_i].get('src') if photo_i is not None else None,
                 'bio': ' '.join(bio).strip()}
         body_end = name_i if name_i is not None else (
             photo_i if photo_i is not None else email_i)
-        appendix = [x for x in b[k:] if x['type'] in ('quote', 'list', 'para', 'head')]
+        appendix = [x for x in b[k:]
+                    if x['type'] in ('quote', 'list', 'para', 'head', 'image')]
 
     head = b[:body_end]
-    kicker, byline, bi = None, [], 0
+    # Scan the opening blocks for a section label and a byline. An article may
+    # lead with an illustration, so look past images rather than stopping at
+    # them — and only drop the blocks actually taken, so the image survives.
+    kicker, byline, bi, seen = None, [], 0, set()
     while bi < len(head):
         blk = head[bi]
+        if blk['type'] == 'image':
+            bi += 1
+            continue
         if blk['type'] == 'head' and blk['level'] <= 3 and kicker is None and bi <= 1:
             t = plain(blk['runs'])
             if tail and t.rstrip(' :') == tail['name']:
                 byline.append(t)
             else:
                 kicker = t
+            seen.add(bi)
             bi += 1
             continue
         if blk['type'] == 'para':
@@ -207,11 +225,12 @@ def normalize(title, slug, blocks, post):
             is_name = len(t) < 55 and not t.endswith(('.', '?', '!', '…'))
             if (is_name and len(byline) < 2) or t.startswith(('अनुवाद', 'शब्दांकन', 'छायाचित्र')):
                 byline.append(t)
+                seen.add(bi)
                 bi += 1
                 continue
         break
 
-    body = head[bi:]
+    body = [x for i, x in enumerate(head) if i not in seen]
     if tail and body and body[-1]['type'] == 'para' and plain(body[-1]['runs']) == tail['name']:
         body = body[:-1]
     if not byline and tail and tail['name']:

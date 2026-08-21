@@ -354,6 +354,8 @@ def block_html(b, side):
         lv = 2 if b['level'] <= 3 else 3
         return f'<h{lv}>{runs_html(b["runs"])}</h{lv}>'
     if t == 'image':
+        if not b.get('file'):        # nothing was downloaded for this one
+            return ''
         cap = f'<figcaption>{esc(b["caption"])}</figcaption>' if b.get('caption') else ''
         return f'<figure class="ph {side}"><img src="{IMG}/{b["file"]}" alt="">{cap}</figure>'
     if t == 'quote':

@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>प्रणती देशपांडे</h1><p class="tag">१ लेख · २०२५–२०२६</p><div class="bio">अमेझॉन आणि फिटरफ्लाय ह्या कंपन्यांमध्ये मानसशास्त्रज्ञ म्हणून कार्यरत. कामाच्या ठिकाणी हिंसेला प्रतिबंध, मुले आणि मोठ्यांसोबत चिकित्सक मानसशास्त्राशी (क्लिनिकल सायकोलॉजी) संबंधित काम हे त्यांचे कार्यक्षेत्र आहे. अनुवाद : संजीवनी कुलकर्णी<p style="margin:.5rem 0 0"><a href="mailto:pranati.deshpande@gmail.com">pranati.deshpande@gmail.com</a></p></div><p class="yr">२०२५</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>प्रणती देशपांडे</h1><p class="tag">१ लेख · २०२५–२०२६</p></div></div><div class="bio">अमेझॉन आणि फिटरफ्लाय ह्या कंपन्यांमध्ये मानसशास्त्रज्ञ म्हणून कार्यरत. कामाच्या ठिकाणी हिंसेला प्रतिबंध, मुले आणि मोठ्यांसोबत चिकित्सक मानसशास्त्राशी (क्लिनिकल सायकोलॉजी) संबंधित काम हे त्यांचे कार्यक्षेत्र आहे. अनुवाद : संजीवनी कुलकर्णी<p style="margin:.5rem 0 0"><a href="mailto:pranati.deshpande@gmail.com">pranati.deshpande@gmail.com</a></p></div><p class="yr">२०२५</p><ol class="arts">
 <li><a href="https://palakneeti.in/%e0%a4%aa%e0%a4%be%e0%a4%b2%e0%a4%95%e0%a4%a4%e0%a5%8d%e0%a4%b5%e0%a4%be%e0%a4%9a%e0%a4%be-%e0%a4%aa%e0%a5%88%e0%a4%b8/" target="_blank" rel="noopener">पालकत्वाचा पैस<span class="out">↗</span></a><div class="meta">मार्च</div></li>
 </ol><footer><p>लेख <a href="https://palakneeti.in" target="_blank" rel="noopener">palakneeti.in</a> वर उघडतील. ही यादी त्या संकेतस्थळावरून आपोआप तयार होते.</p><p><a class="backlink" href="../../">← सगळे अंक</a></p></footer></main>
 
@@ -150,19 +161,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);

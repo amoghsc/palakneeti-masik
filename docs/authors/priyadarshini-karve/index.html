@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>डॉ. प्रियदर्शिनी कर्वे</h1><p class="tag">१ लेख · २०२५–२०२६</p><div class="bio">करिश्मा मोदी डॉ. अफशान मजिद<p style="margin:.5rem 0 0"><a href="mailto:priyadarshini.karve@ssla.edu.in">priyadarshini.karve@ssla.edu.in</a></p></div><p class="yr">२०२५</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>डॉ. प्रियदर्शिनी कर्वे</h1><p class="tag">१ लेख · २०२५–२०२६</p></div></div><div class="bio">करिश्मा मोदी<p style="margin:.5rem 0 0"><a href="mailto:priyadarshini.karve@ssla.edu.in">priyadarshini.karve@ssla.edu.in</a></p></div><p class="yr">२०२५</p><ol class="arts">
 <li><a href="https://palakneeti.in/%e0%a4%ac%e0%a4%bf%e0%a4%97-%e0%a4%b9%e0%a4%bf%e0%a4%b8%e0%a5%8d%e0%a4%9f%e0%a5%8d%e0%a4%b0%e0%a5%80/" target="_blank" rel="noopener">बिग हिस्ट्री<span class="out">↗</span></a><div class="meta">जून</div></li>
 </ol><footer><p>लेख <a href="https://palakneeti.in" target="_blank" rel="noopener">palakneeti.in</a> वर उघडतील. ही यादी त्या संकेतस्थळावरून आपोआप तयार होते.</p><p><a class="backlink" href="../../">← सगळे अंक</a></p></footer></main>
 
@@ -150,19 +161,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);

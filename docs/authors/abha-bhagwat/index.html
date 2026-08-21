@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>आभा भागवत</h1><p class="tag">१ लेख · २०२५–२०२६</p><div class="bio">चित्रकारीला सामाजिकता आणि बालचित्रकलेची जोड देऊन भारतात अनेक ठिकाणी त्यांनी भित्तिचित्रे केली आहेत. ‘रंगजा’ ह्या स्ट्रीट आर्ट ग्रुपच्या संस्थापक कलाकार.<p style="margin:.5rem 0 0"><a href="mailto:abha.bhagwat@gmail.com">abha.bhagwat@gmail.com</a></p></div><p class="yr">२०२५</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>आभा भागवत</h1><p class="tag">१ लेख · २०२५–२०२६</p></div></div><div class="bio">चित्रकारीला सामाजिकता आणि बालचित्रकलेची जोड देऊन भारतात अनेक ठिकाणी त्यांनी भित्तिचित्रे केली आहेत. ‘रंगजा’ ह्या स्ट्रीट आर्ट ग्रुपच्या संस्थापक कलाकार.<p style="margin:.5rem 0 0"><a href="mailto:abha.bhagwat@gmail.com">abha.bhagwat@gmail.com</a></p></div><p class="yr">२०२५</p><ol class="arts">
 <li><a href="https://palakneeti.in/%e0%a4%b6%e0%a4%be%e0%a4%b3%e0%a4%be%e0%a4%82%e0%a4%ae%e0%a4%a7%e0%a4%b2%e0%a5%80-%e0%a4%ad%e0%a4%bf%e0%a4%a4%e0%a5%8d%e0%a4%a4%e0%a4%bf%e0%a4%9a%e0%a4%bf%e0%a4%a4%e0%a5%8d%e0%a4%b0%e0%a4%82/" target="_blank" rel="noopener">शाळांमधली भित्तिचित्रं… सुशोभनाच्या पलीकडे!<span class="out">↗</span></a><div class="meta">ऑगस्ट</div></li>
 </ol><footer><p>लेख <a href="https://palakneeti.in" target="_blank" rel="noopener">palakneeti.in</a> वर उघडतील. ही यादी त्या संकेतस्थळावरून आपोआप तयार होते.</p><p><a class="backlink" href="../../">← सगळे अंक</a></p></footer></main>
 
@@ -150,19 +161,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);

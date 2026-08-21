@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>तृप्ती दरक</h1><p class="tag">१ लेख · २०२५–२०२६</p><div class="bio">प्रयास आरोग्य गट या पुणेस्थित संस्थेमध्ये तरुणांच्या लैंगिक व प्रजनन आरोग्य आणि हक्कांसाठी काम करतात. शाळेमध्ये सर्वसमावेशी लैंगिकता शिक्षण देण्यासाठी कार्यरत आहेत.<p style="margin:.5rem 0 0"><a href="mailto:trupti@prayaspune.org">trupti@prayaspune.org</a></p></div><p class="yr">२०२५</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>तृप्ती दरक</h1><p class="tag">१ लेख · २०२५–२०२६</p></div></div><div class="bio">प्रयास आरोग्य गट या पुणेस्थित संस्थेमध्ये तरुणांच्या लैंगिक व प्रजनन आरोग्य आणि हक्कांसाठी काम करतात. शाळेमध्ये सर्वसमावेशी लैंगिकता शिक्षण देण्यासाठी कार्यरत आहेत.<p style="margin:.5rem 0 0"><a href="mailto:trupti@prayaspune.org">trupti@prayaspune.org</a></p></div><p class="yr">२०२५</p><ol class="arts">
 <li><a href="https://palakneeti.in/%e0%a4%ad%e0%a5%80%e0%a4%a4%e0%a5%80-%e0%a4%a8%e0%a4%b5%e0%a5%8d%e0%a4%b9%e0%a5%87-%e0%a4%b8%e0%a5%8d%e0%a4%b5%e0%a5%80%e0%a4%95%e0%a5%83%e0%a4%a4%e0%a5%80/" target="_blank" rel="noopener">भीती नव्हे… स्वीकृती!<span class="out">↗</span></a><div class="meta">एप्रिल</div></li>
 </ol><footer><p>लेख <a href="https://palakneeti.in" target="_blank" rel="noopener">palakneeti.in</a> वर उघडतील. ही यादी त्या संकेतस्थळावरून आपोआप तयार होते.</p><p><a class="backlink" href="../../">← सगळे अंक</a></p></footer></main>
 
@@ -150,19 +161,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);

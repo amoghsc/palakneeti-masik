@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>प्रीती पुष्पा-प्रकाश</h1><p class="tag">१० लेख · २०२५–२०२६</p><div class="bio">पालकनीतीच्या संपादकगटात सक्रिय सहभाग. आपल्या आयुष्याला नेमका हेतू नसतो हे जाणवून पर्यावरण, शिक्षण आणि लेखन या आवडत्या माध्यमांतले समोर येईल ते आणि आवडेल ते करून आनंदात राहण्याचा प्रयत्न करतात.<p style="margin:.5rem 0 0"><a href="mailto:jonathan.preet@gmail.com">jonathan.preet@gmail.com</a></p></div><p class="yr">२०२६</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>प्रीती पुष्पा-प्रकाश</h1><p class="tag">१० लेख · २०२५–२०२६</p></div></div><div class="bio">पालकनीतीच्या संपादकगटात सक्रिय सहभाग. आपल्या आयुष्याला नेमका हेतू नसतो हे जाणवून पर्यावरण, शिक्षण आणि लेखन या आवडत्या माध्यमांतले समोर येईल ते आणि आवडेल ते करून आनंदात राहण्याचा प्रयत्न करतात.<p style="margin:.5rem 0 0"><a href="mailto:jonathan.preet@gmail.com">jonathan.preet@gmail.com</a></p></div><p class="yr">२०२६</p><ol class="arts">
 <li><a href="https://palakneeti.in/awachita-parimaloo/" target="_blank" rel="noopener">अवचिता परिमळू<span class="out">↗</span></a><div class="meta">जुलै</div></li>
 <li><a href="https://palakneeti.in/baba-lahan-hota-tevha-14/" target="_blank" rel="noopener">बाबा लहान होता तेव्हा – भाग १४<span class="out">↗</span></a><div class="meta"><span class="role">अनुवाद</span> · जुलै</div></li>
 <li><a href="https://palakneeti.in/baba-lahan-hota-tevha-13/" target="_blank" rel="noopener">बाबा लहान होता तेव्हा – १३<span class="out">↗</span></a><div class="meta"><span class="role">अनुवाद</span> · जून</div></li>
@@ -161,19 +172,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);

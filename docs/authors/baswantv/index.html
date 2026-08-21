@@ -52,9 +52,8 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
 .thm svg{width:15px;height:15px;display:none}
-.thm[data-m="auto"] .i-auto,.thm[data-m="light"] .i-light,
-.thm[data-m="dark"] .i-dark{display:block}
-.thm[data-m="light"],.thm[data-m="dark"]{color:var(--moss);border-color:var(--moss)}
+.thm[data-m="light"] .i-light,.thm[data-m="dark"] .i-dark{display:block}
+.thm{color:var(--soft)}
 .tsize{display:flex;gap:4px}
 .tsize button{font-family:var(--sans);background:transparent;color:var(--soft);
   border:1px solid var(--rule);border-radius:999px;cursor:pointer;
@@ -79,14 +78,26 @@ main{max-width:34rem;margin:0 auto;padding:0 1.15rem 4rem}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,8vw,2.5rem);
  margin:0 0 .2rem;color:var(--moss);line-height:1.15}
 .tag{color:var(--faint);margin:0 0 1.8rem;font-size:.9rem}
+.hero{display:flex;gap:1rem;align-items:center;margin:0 0 1.4rem}
+.hero .av{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.hero .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.8rem}
+.hero h1{margin:0}
+.hero .tag{margin:.2rem 0 0}
 .bio{background:var(--surface);border-radius:5px;padding:1rem 1.15rem;
  margin:0 0 1.8rem;font-size:.95rem;color:var(--soft)}
 .bio a{color:var(--moss);word-break:break-all}
-.who{border-top:1px solid var(--rule);padding:.95rem 0;display:flex;
- justify-content:space-between;align-items:baseline;gap:1rem}
+.who{border-top:1px solid var(--rule);padding:.85rem 0;display:flex;
+ align-items:center;gap:.8rem}
+.who .av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+ background:var(--surface)}
+.who .av.none{display:grid;place-items:center;font-family:var(--serif);
+ color:var(--faint);font-size:1.05rem}
+.who .nm{flex:1;min-width:0}
 .who:last-of-type{border-bottom:1px solid var(--rule)}
-.who a{font-family:var(--serif);font-size:1.22rem;color:var(--ink);
- text-decoration:none;line-height:1.3}
+.who a{font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+ text-decoration:none;line-height:1.3;display:block}
 .who .n{color:var(--faint);font-size:.86rem;white-space:nowrap;
  font-variant-numeric:tabular-nums}
 @media (hover:hover){.who a:hover{color:var(--moss)}}
@@ -137,7 +148,7 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
     <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
   </div>
 </header>
-<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><h1>बसवंत विठाबाई बाबाराव</h1><p class="tag">६ लेख · २०२५–२०२६</p><div class="bio">गेली पंधरा वर्षे शाळेमधील पर्यावरण शिक्षण विषयात कार्यरत. पुण्यातील वनराई संस्थेच्या पर्यावरण शिक्षण कार्यक्रमाचे कार्यक्रम समन्वयक.<p style="margin:.5rem 0 0"><a href="mailto:baswantv@gmail.com">baswantv@gmail.com</a></p></div><p class="yr">२०२६</p><ol class="arts">
+<main><p class="crumb"><a href="../../">← पालकनीती मासिक</a></p><div class="hero"><img class="av" src="data:image/jpeg;base64,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" alt="" loading="lazy"><div><h1>बसवंत विठाबाई बाबाराव</h1><p class="tag">६ लेख · २०२५–२०२६</p></div></div><div class="bio">गेली पंधरा वर्षे शाळेमधील पर्यावरण शिक्षण विषयात कार्यरत. पुण्यातील वनराई संस्थेच्या पर्यावरण शिक्षण कार्यक्रमाचे कार्यक्रम समन्वयक.<p style="margin:.5rem 0 0"><a href="mailto:baswantv@gmail.com">baswantv@gmail.com</a></p></div><p class="yr">२०२६</p><ol class="arts">
 <li><a href="https://palakneeti.in/tu-kay-mulgi-ahes-ka/" target="_blank" rel="noopener">तू काय मुलगी आहेस का?<span class="out">↗</span></a><div class="meta">जुलै</div></li>
 <li><a href="https://palakneeti.in/vishnuchya-padveet-bharli-anandshala/" target="_blank" rel="noopener">आनंदशाळेतल्या गोष्टी – गोष्ट चौथी<span class="out">↗</span></a><div class="meta">एप्रिल</div></li>
 <li><a href="https://palakneeti.in/shitavaroon-bhatachee-pareeksha/" target="_blank" rel="noopener">आनंदशाळेतल्या गोष्टी – गोष्ट तिसरी<span class="out">↗</span></a><div class="meta">मार्च</div></li>
@@ -157,19 +168,33 @@ if(t!==null)r.style.setProperty('--tscale',[0.92,1,1.14][+t]||1);}catch(e){}})()
       bar.style.width=(h>0?(scrollY/h)*100:0)+'%';};
     addEventListener('scroll',prog,{passive:true});prog();
   }
-  var modes=['auto','light','dark'],
-      names={auto:'थीम: आपोआप',light:'थीम: उजळ',dark:'थीम: गडद'},
-      tb=document.getElementById('thmBtn'),mi=0;
-  function theme(i){var m=modes[i];mi=i;
-    if(m==='auto'){ if(root.__hostTheme) root.setAttribute('data-theme',root.__hostTheme);
-      else root.removeAttribute('data-theme'); }
-    else root.setAttribute('data-theme',m);
-    tb.setAttribute('data-m',m);tb.setAttribute('aria-label',names[m]);
-    tb.setAttribute('title',names[m]);
-    try{localStorage.setItem('pn-theme',m);}catch(e){}}
-  if(tb){ tb.addEventListener('click',function(){theme((mi+1)%3);});
-    var tm=0;try{tm=Math.max(0,modes.indexOf(localStorage.getItem('pn-theme')));}catch(e){}
-    theme(tm); }
+  /* One click always flips what you can see. Cycling through "auto" meant a
+     reader on a dark phone had to press twice to reach light, because auto
+     and dark looked identical. Auto is still the starting state; the icon
+     shows what the next click will do. */
+  var tb=document.getElementById('thmBtn');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t==='dark') return true;
+    if(t==='light') return false;
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paintIcon(){
+    var target=isDark()?'light':'dark';
+    tb.setAttribute('data-m',target);
+    var lbl=target==='light'?'उजळ करा':'गडद करा';
+    tb.setAttribute('aria-label',lbl); tb.setAttribute('title',lbl);
+  }
+  if(tb){
+    tb.addEventListener('click',function(){
+      var target=isDark()?'light':'dark';
+      root.setAttribute('data-theme',target);
+      try{localStorage.setItem('pn-theme',target);}catch(e){}
+      paintIcon();
+    });
+    paintIcon();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintIcon);
+  }
 
   var steps=[0.92,1,1.14],btns=[].slice.call(document.querySelectorAll('.tsize button'));
   function size(i){root.style.setProperty('--tscale',steps[i]);
