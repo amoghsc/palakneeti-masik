@@ -207,9 +207,10 @@ def article_html(a, n, total):
             cnt = (f'<p class="count">{rec["span"]} मध्ये '
                    f'{dev(rec["n"])} लेख</p>')
         more = (f'<a class="more" href="../authors/{slug}/">'
-                f'या लेखकाचे सगळे लेख →</a>') if slug else ''
+                f'या लेखकाचे इतर लेख →</a>') if slug else ''
+        # the count reads as a caption to the button, so it follows it
         p.append(f'''<aside class="author">{photo}
-    <div><h4>{author_html(tl['name'])}{role}</h4>{mail}{bio}{cnt}{more}</div></aside>''')
+    <div><h4>{author_html(tl['name'])}{role}</h4>{mail}{bio}{more}{cnt}</div></aside>''')
     if a['credit']:
         p.append(f'<p class="credit">{esc(a["credit"])}</p>')
 
@@ -230,9 +231,17 @@ CSS = """
   color:var(--faint);line-height:1}
 .av.sm{width:1.3rem;height:1.3rem;font-size:.72rem;
   display:inline-block;vertical-align:-.3rem;margin-right:.4rem}
-span.av.sm.none{display:inline-grid;vertical-align:-.3rem}
+/* An <img> is a replaced box, so it takes its baseline from its bottom edge;
+   a grid or flex box takes it from the text inside, which put the initial
+   8px below a photo on the same vertical-align. An inline-block with a
+   clipped overflow is the one case that uses the bottom margin edge too
+   (CSS 2.1 10.8.1), so the initial and the photo sit on one rule.
+   line-height matches the height, which centres the letter in the circle. */
+span.av.sm.none{display:inline-block;overflow:hidden;text-align:center;
+  line-height:1.3rem;vertical-align:-.3rem}
 .av.md{width:1.7rem;height:1.7rem;font-size:.9rem}
-.author .count{margin:.55rem 0 0;font-size:.85rem;color:var(--faint)}
+.author .count{margin:.5rem 0 0;font-size:.85rem;color:var(--faint)}
+.author .more + .count{margin-top:.55rem}
 /* the page furniture — palette, bar, controls — lives in chrome.py */
 /* ── masthead ─────────────────────────────────────────────────── */
 .top{padding:3rem 0 2.2rem; text-align:center;}
