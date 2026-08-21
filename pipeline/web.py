@@ -25,6 +25,12 @@ AUTHOR_BY_KEY = {_akey(k): v for k, v in AUTHORS.items()}
 ROLE_SPLIT = re.compile(r'^(अनुवाद|शब्दांकन|छायाचित्र[े]?|संकलन)\s*[:：]\s*(.+)$')
 
 
+def author_slug(name):
+    m = ROLE_SPLIT.match((name or '').strip())
+    person = m.group(2) if m else (name or '')
+    return AUTHOR_BY_KEY.get(_akey(person.strip(' .,')))
+
+
 def author_html(name):
     """Link a byline to its author page, keeping any 'अनुवाद :' prefix outside
        the link so only the person's name is clickable."""
@@ -163,8 +169,11 @@ def article_html(a, n, total):
         bio = f'<p>{esc(tl["bio"])}</p>' if tl['bio'] else ''
         mail = (f'<a class="mail" href="mailto:{esc(tl["email"])}">'
                 f'{esc(tl["email"])}</a>')
+        slug = author_slug(tl['name'])
+        more = (f'<a class="more" href="../authors/{slug}/">'
+                f'या लेखकाचे सगळे लेख →</a>') if slug else ''
         p.append(f'''<aside class="author">{photo}
-    <div><h4>{author_html(tl['name'])}{role}</h4>{mail}{bio}</div></aside>''')
+    <div><h4>{author_html(tl['name'])}{role}</h4>{mail}{bio}{more}</div></aside>''')
     if a['credit']:
         p.append(f'<p class="credit">{esc(a["credit"])}</p>')
 
@@ -331,6 +340,10 @@ main{max-width:var(--measure); margin:0 auto; padding:0 1.15rem 4rem;}
 .author .mail{font-size:.86rem; word-break:break-all;}
 .author p{margin:.45rem 0 0; font-size:.9rem; line-height:1.62;
   color:var(--soft);}
+.author .more{display:inline-block;margin-top:.7rem;font-size:.87rem;
+  font-weight:600;color:var(--moss);text-decoration:none;
+  border:1px solid var(--rule);border-radius:999px;padding:.32rem .85rem;}
+@media (hover:hover){.author .more:hover{border-color:var(--moss)}}
 .credit{margin:.9rem 0 0; font-size:.86rem; color:var(--faint);}
 
 .art-foot{display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between;
