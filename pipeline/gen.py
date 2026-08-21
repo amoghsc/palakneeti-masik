@@ -53,6 +53,7 @@ a { color:$teal; text-decoration:none; word-break:break-all; }
 .pagedjs_page { position:relative; }
 .pagedjs_margin-bottom-left, .pagedjs_margin-bottom-right { display:none; }
 
+.pagedjs_page.nofoot::after { display:none !important; }
 .cover { page:cover; break-after:page; height:297mm; width:210mm; background:#fff;
          position:relative; overflow:hidden; }
 
@@ -91,20 +92,39 @@ figure.ph figcaption { font-size:9pt; color:$grey; text-align:center;
 .toc { break-after:page; position:relative; }
 .toc ol { list-style:none; margin:0; padding:0; }
 
-/* text cover */
-.cover.text { background:$teal; display:flex; flex-direction:column;
-              justify-content:center; align-items:center; }
-.cover.text .badge { width:34mm; height:34mm; border-radius:50%; background:#fff;
-                     display:flex; align-items:center; justify-content:center;
-                     margin-bottom:14mm; }
-.cover.text .badge img { width:22mm; }
-.cover.text h1 { color:#fff; font-size:58pt; font-weight:800; margin:0;
-                 letter-spacing:-1pt; line-height:1; }
-.cover.text .crule { width:38mm; height:3mm; background:$orange; margin:8mm 0; }
-.cover.text h2 { color:$peach; font-size:20pt; font-weight:500; margin:0;
-                 letter-spacing:3pt; }
-.cover.text .foot { position:absolute; bottom:18mm; color:$peach; opacity:.75;
-                    font-size:11pt; letter-spacing:1.5pt; }
+/* ── cover ─────────────────────────────────────────────────────────
+   Handmade-paper ground: a fine grain over a soft mottle, both drawn by
+   the renderer rather than shipped as an image, so it stays crisp at
+   print resolution and adds nothing to the file size. */
+.cover.text {
+  background-color:#FCFBF7;
+  /* a small seamless grain tile plus a soft gradient — cheap to print,
+     where a full-page SVG filter added nearly 2MB to the file */
+  background-image:
+    radial-gradient(120% 90% at 50% 18%, #FFFFFF 0%, #FCFBF6 45%, #F6F3EC 100%),
+    url("assets/paper.png");
+  background-size:100% 100%, 26mm 26mm;
+  background-repeat:no-repeat, repeat;
+  background-blend-mode:multiply;
+  display:flex; flex-direction:column; align-items:center;
+  padding:52mm 20mm 0; text-align:center;
+}
+.cover.text .logo { width:92mm; height:auto; }
+.cover.text .tagline {
+  margin:14mm 0 0; font-family:'Mukta',sans-serif; font-weight:500;
+  font-size:15.5pt; letter-spacing:.6pt; color:#2A2A28;
+}
+.cover.text .rule {
+  width:26mm; height:1.6pt; background:$orange; margin:9mm 0 8mm;
+}
+.cover.text .month {
+  font-family:'Mukta',sans-serif; font-weight:700; font-size:20pt;
+  color:$teal_d; letter-spacing:.5pt; margin:0;
+}
+.cover.text .foot {
+  position:absolute; bottom:16mm; left:0; right:0; text-align:center;
+  font-size:10.5pt; letter-spacing:1.2pt; color:#7C7A74;
+}
 
 /* auto-fit levels, applied by the build when an article leaves a sparse page */
 .art.t1 { line-height:1.66; }
@@ -290,18 +310,21 @@ def css():
 
 
 # ── page builders ───────────────────────────────────────────────────────
+TAGLINE = 'पालकत्वाला वाहिलेले मासिक'
+
+
 def cover():
-    cv = CFG['cover']
-    if cv['mode'] == 'blank':
+    """One template for every issue — only the month changes."""
+    if CFG['cover']['mode'] == 'blank':
         return '<section class="cover"></section>\n'
-    return f'''<section class="cover text">
-  <div class="badge"><img src="assets/p2_X7.png" alt=""></div>
-  <h1>{esc(cv['title'])}</h1>
-  <div class="crule"></div>
-  <h2>{esc(cv['subtitle'])}</h2>
+    return f"""<section class="cover text">
+  <img class="logo" src="assets/logo.svg" alt="पालकनीती">
+  <p class="tagline">{esc(TAGLINE)}</p>
+  <div class="rule"></div>
+  <p class="month">{esc(CFG['month_mr'])}</p>
   <div class="foot">{SITE}</div>
 </section>
-'''
+"""
 
 
 def credits():
@@ -461,7 +484,7 @@ def main():
 <script>
 window.PagedConfig = {{ auto: true, after: () => {{
   document.querySelectorAll('.pagedjs_page').forEach((pg, i) => {{
-    if (i === 0) return;
+    if (i === 0) {{ pg.classList.add('nofoot'); return; }}   // the cover
     const n = i + 1;
     const f = document.createElement('div');
     f.className = 'folio';

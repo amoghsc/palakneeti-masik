@@ -53,10 +53,10 @@ def all_issues():
 INDEX_CSS = """
 /* the palette, bar and controls come from chrome.py */
 .top{padding:2.6rem 0 1.8rem;text-align:center}
+.top .mast{width:min(58%,15rem);margin:0 auto;filter:var(--linework)}
 .top h1{font-family:var(--serif);font-weight:400;
  font-size:clamp(2.3rem,11vw,3rem);margin:0;color:var(--moss);line-height:1.05}
-.top .tag{margin:.7rem 0 0;color:var(--faint);font-size:.88rem;
- letter-spacing:.15em;text-transform:uppercase}
+.top .tag{margin:1rem 0 0;color:var(--soft);font-size:.92rem}
 .issue{border-top:1px solid var(--rule);padding:1.3rem 0}
 .issue:last-of-type{border-bottom:1px solid var(--rule)}
 .issue h2{font-family:var(--serif);font-weight:400;font-size:1.5rem;margin:0;
@@ -102,7 +102,7 @@ def index(issues):
     more = f'<div class="more-row">{"".join(extra)}</div>' if extra else ''
 
     inner = f"""<main>
-  <div class="top"><h1>पालकनीती</h1><p class="tag">मासिक अंक</p></div>
+  <div class="top"><img class="mast" src="{chrome.LOGO}" alt="पालकनीती"><p class="tag">पालकत्वाला वाहिलेले मासिक</p></div>
   {body}
   {more}
   <footer><p>सर्व लेख <a href="https://palakneeti.in" target="_blank"

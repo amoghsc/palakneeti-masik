@@ -10,13 +10,11 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 
 
 def _logo():
-    from PIL import Image
-    p = os.path.join(BASE, 'build', 'assets', 'p2_X7.png')
-    im = Image.open(p).convert('RGBA')
-    im.thumbnail((120, 120), Image.LANCZOS)
-    buf = io.BytesIO()
-    im.save(buf, 'PNG', optimize=True)
-    return 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode()
+    """The masthead logo, inlined so every page is self-contained."""
+    p = os.path.join(BASE, 'build', 'assets', 'logo.svg')
+    with open(p, 'rb') as f:
+        return ('data:image/svg+xml;base64,'
+                + base64.b64encode(f.read()).decode())
 
 
 LOGO = _logo()
@@ -65,14 +63,13 @@ CHROME = """
   background:var(--clay);z-index:60}
 .bar{position:sticky;top:0;z-index:50;background:var(--paper);
   border-bottom:1px solid var(--rule);display:flex;align-items:center;
-  gap:10px;padding:9px max(18px,env(safe-area-inset-left)) 9px 18px}
+  gap:10px;padding:6px max(18px,env(safe-area-inset-left)) 6px 14px}
 .bar .home{display:flex;align-items:center;gap:10px;text-decoration:none;
   color:inherit;min-width:0}
-.bar .tree{width:26px;height:26px;object-fit:contain;flex:none;
+.bar .mark{width:46px;height:46px;object-fit:contain;flex:none;
+  /* black linework on a white disc — invert it for the dark theme */
   filter:var(--linework)}
-.bar .who{font-family:var(--serif);font-size:17px;line-height:1.1;
-  color:var(--moss);letter-spacing:.01em;white-space:nowrap}
-.bar .mo{font-size:11.5px;color:var(--faint);line-height:1.1;margin-top:2px;
+.bar .mo{font-size:12px;color:var(--faint);line-height:1.15;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bar .spacer{flex:1}
 .thm{background:transparent;border:1px solid var(--rule);border-radius:999px;
@@ -170,12 +167,12 @@ _ICONS = '''<svg class="i-auto" viewBox="0 0 16 16" aria-hidden="true"><circle c
 def bar(home, label, progress=True):
     """Top bar. The logo and name always lead back to the front page."""
     pg = '<div class="progress" aria-hidden="true"></div>' if progress else ''
-    sub = f'<div class="mo">{label}</div>' if label else ''
+    sub = f'<span class="mo">{label}</span>' if label else ''
     return f'''{pg}
 <header class="bar">
   <a class="home" href="{home}" title="पालकनीती मासिक">
-    <img class="tree" src="{LOGO}" alt="">
-    <span><span class="who">पालकनीती</span>{sub}</span>
+    <img class="mark" src="{LOGO}" alt="पालकनीती">
+    {sub}
   </a>
   <div class="spacer"></div>
   <button class="thm" type="button" id="thmBtn" data-m="auto" aria-label="थीम">{_ICONS}</button>

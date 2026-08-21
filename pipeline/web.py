@@ -236,6 +236,8 @@ span.av.sm.none{display:inline-grid;vertical-align:-.3rem}
 /* the page furniture — palette, bar, controls — lives in chrome.py */
 /* ── masthead ─────────────────────────────────────────────────── */
 .top{padding:3rem 0 2.2rem; text-align:center;}
+.top .mast{width:min(58%,15rem);margin:0 auto;filter:var(--linework)}
+.top .tagline{margin:1rem 0 0;font-size:.95rem;color:var(--soft)}
 .top h1{font-family:var(--serif); font-weight:400;
   font-size:clamp(2.5rem,12vw,3.4rem); line-height:1.05; margin:0;
   color:var(--moss); text-wrap:balance;}
@@ -390,7 +392,8 @@ def build():
 
     body = f"""<main>
   <div class="top">
-    <h1>पालकनीती</h1>
+    <img class="mast" src="{chrome.LOGO}" alt="पालकनीती">
+    <p class="tagline">पालकत्वाला वाहिलेले मासिक</p>
     <p class="issue">{esc(CFG['month_mr'])}</p>
     <p class="sub">या अंकातले {dev(n)} लेख — फोनवर वाचण्यासाठी.
        मजकुराचा आकार वरच्या पट्टीतून बदलता येईल.</p>
