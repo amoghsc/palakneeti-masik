@@ -262,7 +262,7 @@ def setup(key):
 
     API = ('https://palakneeti.in/wp-json/wp/v2/posts'
            f'?categories={CAT}&per_page=50&orderby=date&order=asc'
-           '&_fields=id,date,slug,link,title,content')
+           '&_fields=id,date,slug,link,title,content,featured_media')
 
     return API
 
@@ -306,15 +306,46 @@ def fetch_image(url):
     return name
 
 
+def featured_urls(posts):
+    """WordPress keeps the featured image outside the post content, so it has
+       to be looked up separately — one request for the whole batch."""
+    ids = sorted({p.get('featured_media') for p in posts if p.get('featured_media')})
+    if not ids:
+        return {}
+    got = fetch_json('https://palakneeti.in/wp-json/wp/v2/media'
+                     f'?include={",".join(str(i) for i in ids)}'
+                     '&per_page=100&_fields=id,source_url')
+    return {m['id']: m['source_url'] for m in got}
+
+
+def add_lead_image(blocks, url):
+    """Put the featured image at the top of the article, unless the same
+       picture already appears in the body."""
+    if not url:
+        return blocks
+    here = {(b.get('src') or '').rsplit('/', 1)[-1]
+            for b in blocks if b['type'] == 'image'}
+    if url.rsplit('/', 1)[-1] in here:
+        return blocks
+    fn = fetch_image(url)
+    if not fn:
+        return blocks
+    return [{'type': 'image', 'file': fn, 'src': url, 'caption': '',
+             'lead': True, 'w': None, 'h': None}] + blocks
+
+
 def main():
     api = setup(KEY_ARG)
     posts = fetch_json(api)
+    media = featured_urls(posts)
     json.dump(posts, open(os.path.join(IDIR, 'raw.json'), 'w'), ensure_ascii=False)
     out = []
     for p in posts:
         title = re.sub(r'\s+', ' ',
                        BeautifulSoup(p['title']['rendered'], 'html.parser').get_text().strip())
-        out.append(normalize(title, p['slug'], to_blocks(p['content']['rendered']), p))
+        blocks = add_lead_image(to_blocks(p['content']['rendered']),
+                                media.get(p.get('featured_media')))
+        out.append(normalize(title, p['slug'], blocks, p))
     json.dump(out, open(os.path.join(IDIR, 'issue.json'), 'w'),
               ensure_ascii=False, indent=1)
 

@@ -64,7 +64,7 @@ dev = lambda n: ''.join(DEV[int(c)] for c in str(n))
 
 
 # ── images: everything is inlined, so everything gets resized first ──────
-def data_uri(path, box, square=False, quality=82):
+def data_uri(path, box, square=False, quality=72):
     im = Image.open(path)
     if im.mode in ('RGBA', 'LA', 'P'):
         im = im.convert('RGBA')
@@ -78,9 +78,12 @@ def data_uri(path, box, square=False, quality=82):
         l, t = (im.width - s) // 2, (im.height - s) // 2
         im = im.crop((l, t, l + s, t + s))
     im.thumbnail((box, box), Image.LANCZOS)
+    # WebP is roughly a third smaller than JPEG at the same quality here, and
+    # every phone browser in use supports it — these pages travel over mobile
+    # data, so the saving is worth more than the compatibility tail.
     buf = io.BytesIO()
-    im.save(buf, 'JPEG', quality=quality, optimize=True, progressive=True)
-    return 'data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode()
+    im.save(buf, 'WEBP', quality=quality, method=5)
+    return 'data:image/webp;base64,' + base64.b64encode(buf.getvalue()).decode()
 
 
 def png_uri(path, box):
@@ -135,7 +138,7 @@ def block_html(b):
     if t == 'image':
         if not b.get('file'):        # nothing was downloaded for this one
             return ''
-        src = data_uri(os.path.join(IMGDIR, b['file']), 1100)
+        src = data_uri(os.path.join(IMGDIR, b['file']), 900)
         cap = (f'<figcaption>{esc(b["caption"])}</figcaption>'
                if b.get('caption') else '')
         return f'<figure><img src="{src}" alt="" loading="lazy">{cap}</figure>'

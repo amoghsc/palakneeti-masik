@@ -418,7 +418,8 @@ def article(a, tight=None):
                 p.append(f'<div class="lead">{block_html(b, "")}</div>'); continue
             lead_done = True
         if b['type'] == 'image':
-            p.append(block_html(b, sides[si % 2])); si += 1
+            p.append(block_html(b, 'full' if b.get('lead') else sides[si % 2]))
+            si += 0 if b.get('lead') else 1
         else:
             p.append(block_html(b, ''))
 
