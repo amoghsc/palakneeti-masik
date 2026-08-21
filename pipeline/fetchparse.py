@@ -31,7 +31,7 @@ BLOCKED = (
     '   the GitHub Actions IP ranges or this tool\'s User-Agent.')
 
 
-def fetch_json(url, attempts=4):
+def fetch_json(url, attempts=6):
     """Fetch JSON, retrying a bot-protection block rather than losing the run."""
     last = ''
     for n in range(1, attempts + 1):
@@ -50,7 +50,7 @@ def fetch_json(url, attempts=4):
         if n == attempts or not transient:
             hint = ('\n   ' + BLOCKED) if 'Imunify360' in last else ''
             raise SystemExit(f'!! {url}\n   {last}{hint}')
-        wait = 5 * n * n                      # 5s, 20s, 45s
+        wait = 5 * n * n                      # 5s → 125s, ~4 min in total
         print(f'   blocked ({last.splitlines()[0]}) — retrying in {wait}s '
               f'[{n}/{attempts - 1}]', flush=True)
         time.sleep(wait)
