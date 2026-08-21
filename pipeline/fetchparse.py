@@ -3,7 +3,7 @@
    structured form the layout needs.   usage: fetchparse.py <issue-key>"""
 import json, os, re, sys, time, urllib.request, urllib.parse, urllib.error
 from bs4 import BeautifulSoup, NavigableString
-from issues import resolve, find_category
+from issues import resolve, find_category, is_month_index
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 # Set when run as a script. Left as None when this module is imported purely
@@ -145,7 +145,15 @@ def to_blocks(html_src):
 
 
 # ── blocks -> layout roles ──────────────────────────────────────────────
-EMAIL = re.compile(r'^[\w.\-+]+@[\w.\-]+\.\w+$')
+# A comma where the dot belongs is a typing slip on the site, not a different
+# address — a comma cannot appear in a domain. Accept it, then repair it, or
+# the author card silently disappears (dr.kasturi1004@gmail,com did exactly
+# that to two articles).
+EMAIL = re.compile(r'^[\w.\-+]+@[\w.\-]+[.,]\w+$')
+
+
+def fix_email(t):
+    return t.replace(',', '.')
 
 
 def normalize(title, slug, blocks, post):
@@ -153,7 +161,8 @@ def normalize(title, slug, blocks, post):
 
     email_i = None
     for i in range(n - 1, max(n - 12, -1), -1):
-        if b[i]['type'] == 'para' and EMAIL.match(plain(b[i]['runs'])):
+        # some articles style the address as a heading, not a paragraph
+        if b[i]['type'] in ('para', 'head') and EMAIL.match(plain(b[i]['runs'])):
             email_i = i
             break
 
@@ -192,7 +201,8 @@ def normalize(title, slug, blocks, post):
         if m:
             role, raw_name = m.group(1), m.group(2).strip()
 
-        tail = {'role': role, 'name': raw_name, 'email': plain(b[email_i]['runs']),
+        tail = {'role': role, 'name': raw_name,
+                'email': fix_email(plain(b[email_i]['runs'])),
                 'photo': b[photo_i]['file'] if photo_i is not None else None,
                 'photo_src': b[photo_i].get('src') if photo_i is not None else None,
                 'bio': ' '.join(bio).strip()}
@@ -306,6 +316,17 @@ def fetch_image(url):
     return name
 
 
+# One March post crams two URLs into a single href separated by a comma, so
+# the pattern stops at the comma and the first one wins.
+DRIVE = re.compile(r'https?://(?:drive|docs)\.google\.com/[^\s"\'<>),]+')
+
+
+def drive_pdf(html_src):
+    """The hand-made edition PDF linked from a month index post."""
+    m = DRIVE.search(html_src or '')
+    return m.group(0) if m else None
+
+
 def featured_urls(posts):
     """WordPress keeps the featured image outside the post content, so it has
        to be looked up separately — one request for the whole batch."""
@@ -341,15 +362,30 @@ def main():
     posts = fetch_json(api)
     media = featured_urls(posts)
     json.dump(posts, open(os.path.join(IDIR, 'raw.json'), 'w'), ensure_ascii=False)
-    out = []
+
+    # The month index post is not an article — just links to the month's
+    # pieces, and up to मे २०२६ the hand-made PDF. Keep the PDF, drop the post.
+    kept, pdf_url = [], None
     for p in posts:
         title = re.sub(r'\s+', ' ',
                        BeautifulSoup(p['title']['rendered'], 'html.parser').get_text().strip())
+        if is_month_index(title):
+            pdf_url = pdf_url or drive_pdf(p['content']['rendered'])
+            print(f'   index post skipped: {title}'
+                  + (f'  (PDF: {pdf_url})' if pdf_url else '  (no PDF link)'))
+            continue
+        kept.append((p, title))
+
+    out = []
+    for p, title in kept:
         blocks = add_lead_image(to_blocks(p['content']['rendered']),
                                 media.get(p.get('featured_media')))
         out.append(normalize(title, p['slug'], blocks, p))
     json.dump(out, open(os.path.join(IDIR, 'issue.json'), 'w'),
               ensure_ascii=False, indent=1)
+    # read by mksite.py, so the front page can point at the hand-made PDF
+    json.dump({'pdf_url': pdf_url},
+              open(os.path.join(IDIR, 'issue-meta.json'), 'w'), ensure_ascii=False)
 
     print(f'{KEY}: {len(out)} articles')
     for a in out:

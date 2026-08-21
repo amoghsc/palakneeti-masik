@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Per-issue configuration and the two visual styles."""
+import re
 
 ISSUES = {
     '2026-07': {
@@ -93,6 +94,27 @@ _dev = lambda s: ''.join(_DEV[int(c)] if c.isdigit() else c for c in str(s))
 
 DEFAULTS = {'style': 'classic', 'cover': {'mode': 'blank'},
             'varsha': '', 'ank': ''}
+
+
+_MONTH_MR = {mr for _, mr in MONTHS}
+_MONTH_EN = {en.lower() for en, _ in MONTHS}
+_MONTH_TITLE = re.compile(r'^(\S+)\s*[-–—]?\s*([०-९]{4}|\d{4})$')
+
+
+def is_month_index(title):
+    """True for the month's index post — the one titled just "मे २०२६".
+
+    It holds no article: only links to that month's pieces and, up to
+    मे २०२६, the hand-made PDF on Drive. From जून २०२६ on they stopped
+    publishing them. Matching on the title rather than a date cut-off means
+    a stray later one is still recognised.
+    """
+    t = re.sub(r'\s+', ' ', (title or '')).strip()
+    m = _MONTH_TITLE.match(t)
+    if not m:
+        return False
+    word = m.group(1)
+    return word in _MONTH_MR or word.lower() in _MONTH_EN
 
 
 def month_parts(key):
