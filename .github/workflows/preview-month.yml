@@ -25,17 +25,21 @@ jobs:
       - name: Look up the month
         working-directory: pipeline
         run: |
-          python - "${{ inputs.month }}" <<'PY' | tee preview.txt
-          import json, sys, urllib.request
+          set -o pipefail    # otherwise tee's exit code hides a failed lookup
+          # stderr joins the log too, so a blocked request explains itself in
+          # the summary instead of leaving an empty box
+          python - "${{ inputs.month }}" 2>&1 <<'PY' | tee preview.txt
+          import html as h
+          import sys
           from issues import resolve, find_category
+          # the same hardened fetch the real build uses: browser-like headers
+          # and six attempts with backoff. A bare "Mozilla/5.0" from a runner
+          # is exactly what Imunify360 blocks, and this is the step editors
+          # run first — so it is the one that must not fall over.
+          from fetchparse import fetch_json as fetch
 
           key = sys.argv[1]
           cfg = resolve(key)
-
-          def fetch(url):
-              req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-              with urllib.request.urlopen(req, timeout=60) as r:
-                  return json.load(r)
 
           print(f"{cfg['month_mr']}  /  {cfg['month_en']}")
           cat = cfg.get('category') or None
@@ -54,7 +58,6 @@ jobs:
                         '&_fields=id,date,title,link')
           print(f"\n{len(posts)} article(s):\n")
           for i, p in enumerate(posts, 1):
-              import html as h
               t = h.unescape(p['title']['rendered'])
               print(f"  {i}. {t}")
               print(f"     {p['date'][:10]}   {p['link']}")
@@ -63,10 +66,12 @@ jobs:
           PY
 
       - name: Summary
+        # runs even when the lookup failed, so the reason reaches the editor
+        if: always()
         run: |
           {
             echo "## ${{ inputs.month }}"
             echo '```'
-            cat pipeline/preview.txt
+            cat pipeline/preview.txt 2>/dev/null || echo "(the lookup produced no output)"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"

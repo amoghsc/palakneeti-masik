@@ -153,8 +153,12 @@ def find_category(key, fetch_json):
             if en.lower() in hay or mr in hay:
                 hits.append(c)
         page += 1
-    # prefer the most specific name (a single month beats 'Aug-Sep')
-    hits.sort(key=lambda c: len(c['name']))
+    # Prefer the most specific name (a single month beats 'Aug-Sep'), then the
+    # category that actually holds the issue. The site has two categories named
+    # exactly "जानेवारी २०२६" — id 727 with 13 posts, id 725 with 2 — and the
+    # API returns them in a different order from one request to the next, so
+    # comparing name length alone picked one of them at random.
+    hits.sort(key=lambda c: (len(c['name']), -c['count']))
     return hits[0] if hits else None
 
 

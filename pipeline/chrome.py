@@ -9,15 +9,18 @@ import base64, io, os
 BASE = os.path.dirname(os.path.abspath(__file__))
 
 
-def _logo():
-    """The masthead logo, inlined so every page is self-contained."""
-    p = os.path.join(BASE, 'build', 'assets', 'logo.svg')
+def _logo(name='logo.svg'):
+    """A masthead logo, inlined so every page is self-contained."""
+    p = os.path.join(BASE, 'build', 'assets', name)
     with open(p, 'rb') as f:
         return ('data:image/svg+xml;base64,'
                 + base64.b64encode(f.read()).decode())
 
 
-LOGO = _logo()
+LOGO = _logo()                       # the stacked mark, for the big masthead
+# The horizontal lockup reads at bar height, where the stacked one collapses
+# into an illegible smudge — 46px has to carry both the disc and the wordmark.
+LOGO_WIDE = _logo('logo-horizontal.svg')
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
          '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
@@ -63,15 +66,43 @@ CHROME = """
   background:var(--clay);z-index:60}
 .bar{position:sticky;top:0;z-index:50;background:var(--paper);
   border-bottom:1px solid var(--rule);display:flex;align-items:center;
-  gap:10px;padding:6px max(18px,env(safe-area-inset-left)) 6px 14px}
-.bar .home{display:flex;align-items:center;gap:10px;text-decoration:none;
-  color:inherit;min-width:0}
-.bar .mark{width:46px;height:46px;object-fit:contain;flex:none;
-  /* black linework on a white disc — invert it for the dark theme */
+  gap:10px;
+  /* symmetric, or the logo cannot sit on the centre line; the right
+     padding used to be keyed to the *left* safe-area inset */
+  padding:6px max(14px,env(safe-area-inset-right))
+          6px max(14px,env(safe-area-inset-left))}
+/* Month left, logo centred, controls right. The two flanking zones share the
+   leftover space equally (flex:1 1 0), which is what actually centres the
+   logo on the viewport — simply letting it fill the gap between them leaves
+   it off by half the difference between the zones, at every width. The
+   controls keep min-width:auto so they never squash; on a phone they are
+   wider than that equal share, so the logo sits left of true centre because
+   there is genuinely no room for anything else. */
+.bar .mo{flex:1 1 0;min-width:0;font-size:13.5px;color:var(--faint);
+  line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .home{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  text-decoration:none;color:inherit;min-width:0}
+.bar .mark{max-height:30px;max-width:100%;width:auto;height:auto;
+  /* black linework on white — invert it for the dark theme */
   filter:var(--linework)}
-.bar .mo{font-size:12px;color:var(--faint);line-height:1.15;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bar .spacer{flex:1}
+.bar .ctl{flex:1 1 0;display:flex;align-items:center;gap:10px;
+  justify-content:flex-end}
+/* On a phone the controls alone are wider than an equal share, so the logo
+   cannot reach the centre whatever we do. Stop trying: give the month its
+   full width (a squeezed equal share truncates फेब्रुवारी) and trim the logo
+   just enough that the row still fits at 320px. */
+@media (max-width:460px){
+  .bar{gap:8px}
+  .bar .mo{flex:0 0 auto}
+  .bar .mark{max-height:24px}
+}
+/* 320px: the longest month (फेब्रुवारी २०२६) plus the controls overruns the
+   row, so the logo gives up the difference rather than the month. */
+@media (max-width:360px){
+  .bar{gap:6px;padding:6px max(12px,env(safe-area-inset-right))
+                     6px max(12px,env(safe-area-inset-left))}
+  .bar .mark{max-height:20px}
+}
 .thm{background:transparent;border:1px solid var(--rule);border-radius:999px;
   width:32px;height:32px;padding:0;cursor:pointer;color:var(--soft);
   display:grid;place-items:center;flex:none;margin-right:2px}
@@ -167,19 +198,22 @@ _ICONS = '''<svg class="i-auto" viewBox="0 0 16 16" aria-hidden="true"><circle c
 def bar(home, label, progress=True):
     """Top bar. The logo and name always lead back to the front page."""
     pg = '<div class="progress" aria-hidden="true"></div>' if progress else ''
-    sub = f'<span class="mo">{label}</span>' if label else ''
+    # always emitted, even when empty: it is the left zone that balances the
+    # controls, and so what centres the logo
+    sub = f'<span class="mo">{label}</span>'
     return f'''{pg}
 <header class="bar">
+  {sub}
   <a class="home" href="{home}" title="पालकनीती मासिक">
-    <img class="mark" src="{LOGO}" alt="पालकनीती">
-    {sub}
+    <img class="mark" src="{LOGO_WIDE}" alt="पालकनीती">
   </a>
-  <div class="spacer"></div>
-  <button class="thm" type="button" id="thmBtn" data-m="auto" aria-label="थीम">{_ICONS}</button>
-  <div class="tsize" role="group" aria-label="अक्षरांचा आकार">
-    <button type="button" aria-pressed="false" aria-label="लहान अक्षरं">अ</button>
-    <button type="button" aria-pressed="true" aria-label="नेहमीचा आकार">अ</button>
-    <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
+  <div class="ctl">
+    <button class="thm" type="button" id="thmBtn" data-m="auto" aria-label="थीम">{_ICONS}</button>
+    <div class="tsize" role="group" aria-label="अक्षरांचा आकार">
+      <button type="button" aria-pressed="false" aria-label="लहान अक्षरं">अ</button>
+      <button type="button" aria-pressed="true" aria-label="नेहमीचा आकार">अ</button>
+      <button type="button" aria-pressed="false" aria-label="मोठी अक्षरं">अ</button>
+    </div>
   </div>
 </header>'''
 
