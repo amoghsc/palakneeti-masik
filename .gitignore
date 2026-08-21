@@ -20,3 +20,5 @@ pipeline/preview.txt
 __pycache__/
 *.pyc
 .venv/
+# rasterised from the SVGs at build time
+pipeline/build/assets/_raster/

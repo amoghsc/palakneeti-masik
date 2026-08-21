@@ -5,7 +5,11 @@ cd "$(dirname "$0")"
 KEY="${1:-2026-07}"
 
 # use a local venv when there is one, otherwise whatever python is on PATH
-if [ -x ./.venv/bin/python ]; then PY=./.venv/bin/python; else PY="$(command -v python3 || command -v python)"; fi
+# the README puts the venv at the repo root; look there too, otherwise a
+# local run silently falls back to a system python without playwright
+if   [ -x ./.venv/bin/python ];    then PY=./.venv/bin/python
+elif [ -x ../.venv/bin/python ];   then PY=../.venv/bin/python
+else PY="$(command -v python3 || command -v python)"; fi
 [ -n "$PY" ] || { echo "!! no python found"; exit 1; }
 OUTNAME=$($PY -c "from issues import resolve; print(resolve('$KEY')['out'])")
 
@@ -70,7 +74,13 @@ if bad:
 else:
     print('   every word on every page was captured')
 "
-$PY topptx.py "$KEY"
+# same rule as the extraction above: the .pptx is a convenience, and must
+# never cost the PDF that has already been printed
+$PY topptx.py "$KEY" || {
+  echo "!! the Canva file could not be assembled — skipping it."
+  echo "   The PDF and the web edition are unaffected."
+  rm -f "build/${OUTNAME}_canva.pptx"
+}
 fi
 KEY="$KEY" $PY -c "
 from pypdf import PdfReader

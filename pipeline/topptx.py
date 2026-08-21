@@ -12,6 +12,53 @@ from issues import resolve
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 B = os.path.join(BASE, 'build')
+RASTER = os.path.join(B, 'assets', '_raster')
+
+
+def _rasterise(src, dst, width=1600):
+    """PowerPoint has no SVG; draw it in the browser and save a PNG."""
+    import base64
+    from playwright.sync_api import sync_playwright
+    uri = ('data:image/svg+xml;base64,'
+           + base64.b64encode(open(src, 'rb').read()).decode())
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    with sync_playwright() as p:
+        br = p.chromium.launch()
+        pg = br.new_page(viewport={'width': width, 'height': width})
+        pg.set_content('<body style="margin:0">'
+                       f'<img src="{uri}" style="width:{width}px;display:block">')
+        pg.wait_for_selector('img')
+        pg.query_selector('img').screenshot(path=dst, omit_background=True)
+        br.close()
+
+
+def usable(path):
+    """A path python-pptx can actually embed, or None.
+
+    Anything Pillow cannot decode raises deep inside python-pptx and takes the
+    whole build with it, so decide here instead: convert SVG, and let an
+    unreadable file cost one picture rather than the issue.
+    """
+    if not os.path.exists(path):
+        return None
+    if path.lower().endswith('.svg'):
+        png = os.path.join(RASTER, os.path.basename(path)[:-4] + '.png')
+        if not os.path.exists(png):
+            try:
+                _rasterise(path, png)
+            except Exception as e:
+                print(f'   !! could not convert {os.path.basename(path)}: {e}')
+                return None
+        return png
+    try:
+        from PIL import Image
+        with Image.open(path) as im:
+            im.verify()
+    except Exception:
+        print(f'   !! skipping unreadable image {os.path.basename(path)}')
+        return None
+    return path
+
 KEY = sys.argv[1] if len(sys.argv) > 1 else '2026-07'
 CFG = resolve(KEY)
 
@@ -143,8 +190,8 @@ for pg in layout:
             set_edge(sh, s.get('edgeColor'), px(s.get('edgeW', 0)))
 
         elif s['kind'] == 'img':
-            path = os.path.join(B, s['src'])
-            if os.path.exists(path):
+            path = usable(os.path.join(B, s['src']))
+            if path:
                 pic = sl.shapes.add_picture(path, emu(X), emu(Y), emu(W), emu(H))
                 if s.get('circle'):
                     set_geom(pic, 'ellipse')
