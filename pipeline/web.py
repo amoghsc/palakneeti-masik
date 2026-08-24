@@ -4,7 +4,7 @@
 import base64, html, io, json, os, re, sys
 import chrome
 from PIL import Image
-from issues import resolve, MASTHEAD, SITE
+from issues import resolve, MASTHEAD, SITE, MONTHS, month_parts
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 B = os.path.join(BASE, 'build')
@@ -12,6 +12,9 @@ KEY = sys.argv[1] if len(sys.argv) > 1 else '2026-07'
 CFG = resolve(KEY)
 DATA = CFG.get('data', KEY)
 IMGDIR = os.path.join(B, 'images', DATA)
+# 'जुलै' rather than 'जुलै २०२६' — taken from the key, so it does not
+# depend on how month_mr happens to be written for a given issue
+MONTH_NAME = MONTHS[month_parts(KEY)[1] - 1][1]
 
 esc = lambda t: html.escape(t, quote=False)
 
@@ -273,8 +276,6 @@ span.av.sm.none{display:inline-block;overflow:hidden;text-align:center;
   color:var(--moss); text-wrap:balance;}
 .top .issue{margin:.9rem 0 0; font-size:.9rem; letter-spacing:.16em;
   text-transform:uppercase; color:var(--faint);}
-.top .sub{margin:1.4rem auto 0; max-width:26rem; color:var(--soft);
-  font-size:.97rem; line-height:1.7;}
 
 /* ── contents ─────────────────────────────────────────────────── */
 .contents{scroll-margin-top:4.5rem; padding-top:.5rem;}
@@ -429,7 +430,7 @@ def build():
     if href:
         attrs = ' target="_blank" rel="noopener"' if external else ''
         pdf_btn = (f'<p class="getpdf-row"><a class="getpdf" '
-                   f'href="{html.escape(href)}"{attrs}>संपूर्ण अंक PDF'
+                   f'href="{html.escape(href)}"{attrs}>{esc(MONTH_NAME)} अंक PDF'
                    f'{" ↗" if external else ""}</a></p>')
 
     body = '\n'.join(article_html(a, i, n) for i, a in enumerate(arts, 1))
@@ -439,8 +440,6 @@ def build():
     <img class="mast" src="{chrome.LOGO}" alt="पालकनीती">
     <p class="tagline">पालकत्वाला वाहिलेले मासिक</p>
     <p class="issue">{esc(CFG['month_mr'])}</p>
-    <p class="sub">या अंकातले {dev(n)} लेख — फोनवर वाचण्यासाठी.
-       मजकुराचा आकार वरच्या पट्टीतून बदलता येईल.</p>
     {pdf_btn}
   </div>
 
