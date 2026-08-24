@@ -52,6 +52,18 @@ Press **Run workflow**. It takes about three minutes.
 Open the finished run. At the bottom under **Artifacts** there is a zip with
 the **PDF** and the **Canva file**. Download, check it, send it out.
 
+### 3b. Optional: host the PDF on Google Drive
+
+If you would rather readers download from Drive than from GitHub, upload the
+PDF to Drive, copy the sharing link, then run **Actions → Set the PDF link**
+with the month and that link. Both **PDF** buttons — the one on the front
+page and the one on the month's page — will point there instead.
+
+Make sure the Drive file is shared as *Anyone with the link*, or readers will
+see a request-access screen.
+
+To undo it, run the same workflow with the link box left empty.
+
 ### 4. The web version publishes itself
 
 It appears on the site within a minute or two, and the month is added to the
