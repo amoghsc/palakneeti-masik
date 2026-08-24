@@ -15,7 +15,9 @@ on:
         type: choice
         options: [twocol, classic, editorial]
       cover:
-        description: 'Cover page'
+        description: >-
+          Cover page. An image uploaded to covers/<month>.jpg is used
+          automatically and beats "title"; "blank" beats both.
         required: true
         default: title
         type: choice

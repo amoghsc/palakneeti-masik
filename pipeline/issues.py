@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Per-issue configuration and the two visual styles."""
+import os
 import re
 
 ISSUES = {
@@ -92,6 +93,24 @@ MONTHS = [('January', 'जानेवारी'), ('February', 'फेब्र
 _DEV = '०१२३४५६७८९'
 _dev = lambda s: ''.join(_DEV[int(c)] if c.isdigit() else c for c in str(s))
 
+COVER_EXTS = ('jpg', 'jpeg', 'png', 'webp')
+
+
+def cover_image(key):
+    """An uploaded cover for this month, or None.
+
+    Editors drop covers/<YYYY-MM>.jpg into the repository with GitHub's own
+    "Upload files" page — the workflow form cannot take a file, but that page
+    can. Having the file is the instruction: no extra dropdown to forget.
+    """
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    for ext in COVER_EXTS:
+        p = os.path.join(root, 'covers', f'{key}.{ext}')
+        if os.path.exists(p):
+            return p
+    return None
+
+
 DEFAULTS = {'style': 'classic', 'cover': {'mode': 'blank'},
             'varsha': '', 'ank': ''}
 
@@ -142,6 +161,13 @@ def resolve(key):
         cfg['month_en'] = f'{en} {y}'
     if cfg.get('cover', {}).get('subtitle') is None and cfg['cover'].get('mode') == 'text':
         cfg['cover'] = dict(cfg['cover'], subtitle=cfg['month_en'])
+    # An uploaded cover wins over the standard one — uploading it is the
+    # decision. cover=blank still wins over both: that is someone explicitly
+    # asking for an empty page to draw on.
+    if cfg['cover'].get('mode') != 'blank':
+        img = cover_image(key)
+        if img:
+            cfg['cover'] = {'mode': 'image', 'path': img}
     cfg.setdefault('out', 'palakneeti_' + key.replace('-', '_'))
     return cfg
 
