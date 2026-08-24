@@ -67,7 +67,7 @@ def all_issues():
 INDEX_CSS = """
 /* the palette, bar and controls come from chrome.py */
 .top{padding:2.6rem 0 1.8rem;text-align:center}
-.top .mast{width:min(58%,15rem);margin:0 auto;filter:var(--linework)}
+.top .mast{width:min(82%,21rem);margin:0 auto;filter:var(--linework)}
 .top h1{font-family:var(--serif);font-weight:400;
  font-size:clamp(2.3rem,11vw,3rem);margin:0;color:var(--moss);line-height:1.05}
 .top .tag{margin:1rem 0 0;color:var(--soft);font-size:.92rem}
@@ -80,7 +80,7 @@ INDEX_CSS = """
 .issue a{display:inline-block;text-decoration:none;font-size:.9rem;
  font-weight:600;padding:.42rem .9rem;border-radius:999px}
 .read{background:var(--moss);color:var(--paper)}
-.pdf{border:1px solid var(--rule);color:var(--soft)}
+.pdf{background:var(--clay);color:var(--paper);border:1px solid var(--clay)}
 .titles{margin:.7rem 0 0;padding-left:1.1rem;color:var(--soft);font-size:.88rem}
 .titles li{margin:.15rem 0}
 .more-row{margin-top:2rem;display:flex;gap:.6rem;flex-wrap:wrap}
@@ -122,7 +122,7 @@ def index(issues):
     more = f'<div class="more-row">{"".join(extra)}</div>' if extra else ''
 
     inner = f"""<main>
-  <div class="top"><img class="mast" src="{chrome.LOGO}" alt="पालकनीती"><p class="tag">पालकत्वाला वाहिलेले मासिक</p></div>
+  <div class="top"><img class="mast" src="{chrome.LOGO_WIDE}" alt="पालकनीती"><p class="tag">पालकत्वाला वाहिलेले मासिक</p></div>
   {body}
   {more}
   <footer><p>सर्व लेख <a href="https://palakneeti.in" target="_blank"
