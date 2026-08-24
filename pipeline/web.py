@@ -268,14 +268,16 @@ span.av.sm.none{display:inline-block;overflow:hidden;text-align:center;
 .author .more + .count{margin-top:.55rem}
 /* the page furniture — palette, bar, controls — lives in chrome.py */
 /* ── masthead ─────────────────────────────────────────────────── */
-.top{padding:3rem 0 2.2rem; text-align:center;}
-.top .mast{width:min(58%,15rem);margin:0 auto;filter:var(--linework)}
+.top{padding:2rem 0 1.6rem; text-align:center;}
+/* the wide lockup: a quarter the height of the stacked one, so the articles
+   start near the top of the first screen on a phone */
+.top .mast{width:min(82%,21rem);margin:0 auto;filter:var(--linework)}
 .top .tagline{margin:1rem 0 0;font-size:.95rem;color:var(--soft)}
 .top h1{font-family:var(--serif); font-weight:400;
   font-size:clamp(2.5rem,12vw,3.4rem); line-height:1.05; margin:0;
   color:var(--moss); text-wrap:balance;}
-.top .issue{margin:.9rem 0 0; font-size:.9rem; letter-spacing:.16em;
-  text-transform:uppercase; color:var(--faint);}
+.top .issue{margin:1.1rem 0 0; font-family:var(--serif); font-size:1.62rem;
+  line-height:1.15; color:var(--ink); letter-spacing:0;}
 
 /* ── contents ─────────────────────────────────────────────────── */
 .contents{scroll-margin-top:4.5rem; padding-top:.5rem;}
@@ -377,10 +379,11 @@ span.av.sm.none{display:inline-block;overflow:hidden;text-align:center;
 .colophon .site{display:inline-block; margin-top:.4rem; font-weight:600;}
 
 .getpdf-row{margin:1.6rem 0 0}
-.getpdf{display:inline-flex;align-items:center;gap:.4rem;padding:.52rem 1.15rem;
-  border:1px solid var(--rule);border-radius:999px;background:var(--surface);
-  font-size:.9rem;font-weight:600;color:var(--moss);text-decoration:none}
-@media (hover:hover){.getpdf:hover{border-color:var(--moss)}}
+.getpdf{display:inline-flex;align-items:center;gap:.45rem;padding:.7rem 1.5rem;
+  border:1px solid var(--clay);border-radius:999px;background:var(--clay);
+  font-size:1rem;font-weight:700;color:var(--paper);text-decoration:none;
+  box-shadow:0 2px 8px rgba(0,0,0,.13)}
+@media (hover:hover){.getpdf:hover{filter:brightness(1.08)}}
 
 .fab{position:fixed; right:1rem; bottom:calc(1rem + env(safe-area-inset-bottom));
   z-index:55; background:var(--moss); color:var(--paper); border:none;
@@ -437,7 +440,7 @@ def build():
 
     body = f"""<main>
   <div class="top">
-    <img class="mast" src="{chrome.LOGO}" alt="पालकनीती">
+    <img class="mast" src="{chrome.LOGO_WIDE}" alt="पालकनीती">
     <p class="tagline">पालकत्वाला वाहिलेले मासिक</p>
     <p class="issue">{esc(CFG['month_mr'])}</p>
     {pdf_btn}
