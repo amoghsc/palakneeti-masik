@@ -4,7 +4,7 @@
 import base64, html, io, json, os, re, sys
 import chrome
 from PIL import Image
-from issues import resolve, MASTHEAD, SITE, MONTHS, month_parts
+from issues import resolve, MASTHEAD, SITE, MONTHS, month_parts, manual_pdf
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 B = os.path.join(BASE, 'build')
@@ -74,6 +74,9 @@ def pdf_link():
     the front page. Otherwise it is the file build.sh has just produced, which
     the workflow copies next to this page, so the bare name resolves.
     """
+    set_by_hand = manual_pdf(KEY)
+    if set_by_hand:
+        return set_by_hand, True
     try:
         meta = json.load(open(os.path.join(BASE, 'data', DATA, 'issue-meta.json')))
         if meta.get('pdf_url'):

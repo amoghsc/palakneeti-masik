@@ -8,7 +8,7 @@ rebuilt from what is actually on disk.
     mksite.py <issue-key> <repo-root>
 """
 import html, json, os, sys, datetime
-from issues import resolve
+from issues import resolve, manual_pdf
 import chrome
 
 KEY = sys.argv[1]
@@ -26,9 +26,9 @@ def record():
                                        'issue.json')))
     # up to मे २०२६ the issue PDF was made by hand and put on Drive; the
     # month index post carried the link, and fetchparse kept it
-    pdf_url = None
+    pdf_url = manual_pdf(KEY)
     mp = os.path.join(PIPE, 'data', cfg.get('data', KEY), 'issue-meta.json')
-    if os.path.exists(mp):
+    if not pdf_url and os.path.exists(mp):
         pdf_url = json.load(open(mp)).get('pdf_url')
     # a rebuild must not drop a link recorded by an earlier one
     old = os.path.join(dest, 'meta.json')

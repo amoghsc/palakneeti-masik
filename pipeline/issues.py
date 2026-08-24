@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Per-issue configuration and the two visual styles."""
+import json
 import os
 import re
 
@@ -93,6 +94,25 @@ MONTHS = [('January', 'जानेवारी'), ('February', 'फेब्र
 _DEV = '०१२३४५६७८९'
 _dev = lambda s: ''.join(_DEV[int(c)] if c.isdigit() else c for c in str(s))
 
+def _root():
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def manual_pdf(key):
+    """A PDF link set by hand for this month, or None.
+
+    Kept in pdf-links.json at the repository root and written by the "Set the
+    PDF link" workflow. It beats everything the build knows about: someone
+    pasting a link has decided where readers should be sent, usually because
+    the issue now lives on Drive rather than in this repository.
+    """
+    try:
+        with open(os.path.join(_root(), 'pdf-links.json'), encoding='utf-8') as f:
+            return (json.load(f).get(key) or '').strip() or None
+    except Exception:
+        return None
+
+
 COVER_EXTS = ('jpg', 'jpeg', 'png', 'webp')
 
 
@@ -103,7 +123,7 @@ def cover_image(key):
     "Upload files" page — the workflow form cannot take a file, but that page
     can. Having the file is the instruction: no extra dropdown to forget.
     """
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    root = _root()
     for ext in COVER_EXTS:
         p = os.path.join(root, 'covers', f'{key}.{ext}')
         if os.path.exists(p):

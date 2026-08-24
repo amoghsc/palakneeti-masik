@@ -1,0 +1,118 @@
+name: Set the PDF link
+
+# Point a month's PDF buttons at a file you have uploaded to Google Drive,
+# so readers download from there rather than from this repository.
+#
+# Run it after you have built the issue and put the PDF on Drive.
+on:
+  workflow_dispatch:
+    inputs:
+      month:
+        description: 'Month, as YYYY-MM (e.g. 2026-09)'
+        required: true
+        type: string
+      url:
+        description: >-
+          Paste the Google Drive link. Leave empty to undo and go back to
+          the PDF built by the workflow.
+        required: false
+        type: string
+
+concurrency:
+  group: build-issue-${{ inputs.month }}
+  cancel-in-progress: false
+
+jobs:
+  set:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the month and the link
+        env:
+          URL: ${{ inputs.url }}
+        run: |
+          echo "${{ inputs.month }}" | grep -Eq '^[0-9]{4}-[0-9]{2}$' \
+            || { echo "::error::Month must look like 2026-09"; exit 1; }
+          # an empty url is how you undo, so only a non-empty one is checked
+          if [ -n "$URL" ] && ! printf '%s' "$URL" | grep -Eq '^https://'; then
+            echo "::error::The link must start with https:// — paste the whole address from the browser bar."
+            exit 1
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Record the link
+        env:
+          KEY: ${{ inputs.month }}
+          URL: ${{ inputs.url }}
+        run: |
+          python - <<'PY'
+          import json, os
+          key, url = os.environ['KEY'], os.environ['URL'].strip()
+          try:
+              links = json.load(open('pdf-links.json'))
+          except Exception:
+              links = {}
+          if url:
+              links[key] = url
+              print(f'{key} -> {url}')
+          else:
+              links.pop(key, None)
+              print(f'{key}: link cleared, back to the built-in PDF')
+          json.dump(dict(sorted(links.items())), open('pdf-links.json', 'w'),
+                    ensure_ascii=False, indent=1)
+          PY
+
+      - name: Rebuild that month's page and the front page
+        working-directory: pipeline
+        run: |
+          set -o pipefail
+          # the articles are not kept in the repository, so fetch them again;
+          # this is the same path a build takes, minus the PDF itself
+          python fetchparse.py "${{ inputs.month }}"
+          python web.py "${{ inputs.month }}"
+          mkdir -p "../docs/${{ inputs.month }}"
+          cp "build/web-${{ inputs.month }}.html" "../docs/${{ inputs.month }}/index.html"
+          python mksite.py "${{ inputs.month }}" ..
+
+      - name: Publish
+        run: |
+          git config user.name  "palakneeti-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs pdf-links.json
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git commit -m "PDF link for ${{ inputs.month }}"
+          for attempt in 1 2 3 4 5; do
+            if git push; then exit 0; fi
+            echo "push rejected — rebasing"
+            git pull --rebase origin main
+          done
+          echo "::error::could not publish after 5 attempts"
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## PDF link — ${{ inputs.month }}"
+            echo
+            if [ -n "${{ inputs.url }}" ]; then
+              echo "Both PDF buttons for this month now open:"
+              echo
+              echo "<${{ inputs.url }}>"
+            else
+              echo "The link was cleared. The buttons point at the PDF in this repository again."
+            fi
+            echo
+            echo "Give the site a minute, then refresh."
+          } >> "$GITHUB_STEP_SUMMARY"
