@@ -63,6 +63,27 @@ DEV = '०१२३४५६७८९'
 dev = lambda n: ''.join(DEV[int(c)] for c in str(n))
 
 
+def pdf_link():
+    """Where this issue's PDF lives: (href, is_external).
+
+    Up to मे २०२६ the edition was laid out by hand and put on Drive, and the
+    month index post carried the link — that one wins, exactly as it does on
+    the front page. Otherwise it is the file build.sh has just produced, which
+    the workflow copies next to this page, so the bare name resolves.
+    """
+    try:
+        meta = json.load(open(os.path.join(BASE, 'data', DATA, 'issue-meta.json')))
+        if meta.get('pdf_url'):
+            return meta['pdf_url'], True
+    except Exception:
+        pass
+    name = CFG['out'] + '.pdf'
+    # build/ during a workflow run, docs/<key>/ when an already published
+    # month is regenerated on its own
+    here = (os.path.join(B, name), os.path.join(ROOT, 'docs', KEY, name))
+    return (name, False) if any(os.path.exists(x) for x in here) else (None, False)
+
+
 # ── images: everything is inlined, so everything gets resized first ──────
 def data_uri(path, box, square=False, quality=72):
     # one unreadable file must not take the whole issue down
@@ -354,6 +375,12 @@ span.av.sm.none{display:inline-block;overflow:hidden;text-align:center;
 .colophon dd{margin:0;}
 .colophon .site{display:inline-block; margin-top:.4rem; font-weight:600;}
 
+.getpdf-row{margin:1.6rem 0 0}
+.getpdf{display:inline-flex;align-items:center;gap:.4rem;padding:.52rem 1.15rem;
+  border:1px solid var(--rule);border-radius:999px;background:var(--surface);
+  font-size:.9rem;font-weight:600;color:var(--moss);text-decoration:none}
+@media (hover:hover){.getpdf:hover{border-color:var(--moss)}}
+
 .fab{position:fixed; right:1rem; bottom:calc(1rem + env(safe-area-inset-bottom));
   z-index:55; background:var(--moss); color:var(--paper); border:none;
   border-radius:999px; padding:.7rem 1.1rem; font-family:var(--sans);
@@ -397,6 +424,14 @@ def build():
     cred = ''.join(f'<dt>{esc(h.rstrip(" :"))}</dt><dd>{esc(" ".join(v))}</dd>'
                    for h, v in MASTHEAD[:3])
 
+    href, external = pdf_link()
+    pdf_btn = ''
+    if href:
+        attrs = ' target="_blank" rel="noopener"' if external else ''
+        pdf_btn = (f'<p class="getpdf-row"><a class="getpdf" '
+                   f'href="{html.escape(href)}"{attrs}>संपूर्ण अंक PDF'
+                   f'{" ↗" if external else ""}</a></p>')
+
     body = '\n'.join(article_html(a, i, n) for i, a in enumerate(arts, 1))
 
     body = f"""<main>
@@ -406,6 +441,7 @@ def build():
     <p class="issue">{esc(CFG['month_mr'])}</p>
     <p class="sub">या अंकातले {dev(n)} लेख — फोनवर वाचण्यासाठी.
        मजकुराचा आकार वरच्या पट्टीतून बदलता येईल.</p>
+    {pdf_btn}
   </div>
 
   <nav class="contents" id="contents" aria-label="अनुक्रम">
