@@ -22,3 +22,4 @@ __pycache__/
 .venv/
 # rasterised from the SVGs at build time
 pipeline/build/assets/_raster/
+.DS_Store

@@ -126,6 +126,12 @@ figure.ph figcaption { font-size:9pt; color:$grey; text-align:center;
   font-size:10.5pt; letter-spacing:1.2pt; color:#7C7A74;
 }
 
+/* an uploaded cover: edge to edge, no margin, cropped to fill rather than
+   letterboxed, and centred on both axes */
+.cover.img { padding:0; display:block; background:#fff; }
+.cover.img img { width:210mm; height:297mm; object-fit:cover;
+                 object-position:center center; display:block; }
+
 /* auto-fit levels, applied by the build when an article leaves a sparse page */
 .art.t1 { line-height:1.66; }
 .art.t1 p { margin-bottom:2.5mm; }
@@ -317,6 +323,12 @@ def cover():
     """One template for every issue — only the month changes."""
     if CFG['cover']['mode'] == 'blank':
         return '<section class="cover"></section>\n'
+    if CFG['cover']['mode'] == 'image':
+        # relative to build/, where this document is written, so file:// can
+        # reach it during the render
+        src = os.path.relpath(CFG['cover']['path'], B)
+        return (f'<section class="cover img">'
+                f'<img src="{html.escape(src)}" alt=""></section>\n')
     return f"""<section class="cover text">
   <img class="logo" src="assets/logo.svg" alt="पालकनीती">
   <p class="tagline">{esc(TAGLINE)}</p>
