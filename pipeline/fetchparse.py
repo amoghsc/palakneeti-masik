@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Fetch one month's articles from palakneeti.in and turn them into the
    structured form the layout needs.   usage: fetchparse.py <issue-key>"""
-import json, os, re, sys, time, urllib.request, urllib.parse, urllib.error
+import json, os, re, ssl, sys, time, urllib.request, urllib.parse, urllib.error
 from bs4 import BeautifulSoup, NavigableString
 from issues import resolve, find_category, is_month_index
 
@@ -31,6 +31,20 @@ BLOCKED = (
     '   the GitHub Actions IP ranges or this tool\'s User-Agent.')
 
 
+CERT = (
+    "palakneeti.in's security certificate is not valid for that name.\n"
+    '   This is nothing to do with the tool, this repository, or your access to\n'
+    '   it — the certificate is served by whoever hosts palakneeti.in, and only\n'
+    '   they can renew it. Open https://palakneeti.in in a browser and you will\n'
+    '   see the same warning. Retrying will not clear it.')
+
+DOWN = (
+    'palakneeti.in answered, but with a server error and no content, so there\n'
+    '   is nothing to read. Open https://palakneeti.in in a browser: if the site\n'
+    '   is down or being worked on, the build can only wait for it to come back.\n'
+    '   Again, this is the website, not the tool or your access.')
+
+
 def fetch_json(url, attempts=6):
     """Fetch JSON, retrying a bot-protection block rather than losing the run."""
     last = ''
@@ -46,13 +60,22 @@ def fetch_json(url, attempts=6):
             last = f'HTTP {e.code} {e.reason}\n   {body}'
             transient = e.code in (403, 429, 500, 502, 503, 504)
         except urllib.error.URLError as e:
+            # A bad certificate is not going to fix itself in 4 minutes, and
+            # calling it "blocked" sends people hunting for a bot-protection
+            # problem they do not have.
+            if isinstance(e.reason, ssl.SSLError):
+                raise SystemExit(f'!! {url}\n   {e.reason}\n   {CERT}')
             last, transient = f'could not connect: {e.reason}', True
         if n == attempts or not transient:
-            hint = ('\n   ' + BLOCKED) if 'Imunify360' in last else ''
+            hint = ''
+            if 'Imunify360' in last:
+                hint = '\n   ' + BLOCKED
+            elif re.match(r'HTTP 5\d\d', last):
+                hint = '\n   ' + DOWN
             raise SystemExit(f'!! {url}\n   {last}{hint}')
         wait = 5 * n * n                      # 5s → 125s, ~4 min in total
-        print(f'   blocked ({last.splitlines()[0]}) — retrying in {wait}s '
-              f'[{n}/{attempts - 1}]', flush=True)
+        print(f'   attempt {n} of {attempts - 1} failed '
+              f'({last.splitlines()[0]}) — retrying in {wait}s', flush=True)
         time.sleep(wait)
     try:
         return json.loads(raw)
